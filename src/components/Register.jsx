@@ -1,19 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styles from './Register.module.css';
 
 const Register = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [verifyPassword, setVerifyPassword] = useState('');
     const [showPasswords, setShowPasswords] = useState(false);
-    const [message, setMessage] = useState('');
+    const [errors, setErrors] = useState([]);
+    const [passwordMatch, setPasswordMatch] = useState(false);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const validateInput = async () => {
+            try {
+                const response = await fetch('https://seismologos.onrender.com/validate/user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const result = await response.json();
+
+                if(!response.ok){
+                    let errorMessages = [];
+                    if (result.errors && Array.isArray(result.errors)) {
+                        errorMessages = result.errors.map(err => err.msg || 'ΣΦΑΛΜΑ: Άγνωστο Σφάλμα');
+                    } else {
+                        errorMessages.push('ΣΦΑΛΜΑ: Άγνωστο Σφάλμα');
+                    }
+                    if (password !== verifyPassword) {
+                        errorMessages.push('Οι κωδικοί πρόσβασης δεν ταιριάζουν');
+                    }
+                    setErrors(errorMessages);
+                }
+                else
+                {
+                    setErrors([]);
+                    setPasswordMatch(false);
+                }
+
+                if (password === verifyPassword)
+                {
+                    setPasswordMatch(false);
+                }
+                else if(!passwordMatch)
+                {
+                    setErrors([...errors, 'Οι κωδικοί πρόσβασης δεν ταιριάζουν']);
+                    setPasswordMatch(true);
+                }
+            } catch (error) {
+                setErrors([`ERROR: ${error.message}`]);
+            }
+        };
+        validateInput();
+    }, [username, password, verifyPassword]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (password !== verifyPassword) {
-            setMessage("Passwords do not match!");
+        if(errors != [] && password !== verifyPassword)
             return;
-        }
 
         try {
             const response = await fetch('https://seismologos.onrender.com/users', {
@@ -27,70 +77,75 @@ const Register = () => {
             const result = await response.json();
 
             if (response.ok) {
-                setMessage('User registered successfully!');
+                navigate('/login');
             } else {
-                let errorMessage = ''; 
+                let errorMessages = [];
                 if (result.errors && Array.isArray(result.errors)) {
-                    errorMessage = result.errors.map(err => err.msg || 'An unknown error occurred').join('\n');
-                } else if(result.error){
-                    errorMessage = result.error;
+                    errorMessages = result.errors.map(err => err.msg || 'ΣΦΑΛΜΑ: Άγνωστο Σφάλμα');
+                } else {
+                    errorMessages.push('ΣΦΑΛΜΑ: Άγνωστο Σφάλμα');
                 }
-                else {
-                    errorMessage = 'An unknown error occurred';
-                }
-                setMessage(`\n${errorMessage}`);
+                setErrors(errorMessages);
             }
         } catch (error) {
-            setMessage(`Error: ${error.message}`);
+            setErrors([`ERROR: ${error.message}`]);
         }
     };
 
     return (
-        <div>
-            <h1>Register</h1>
-            <form onSubmit={handleSubmit}>
+        <div className={styles.container}>
+            <h1 className={styles.heading}>Εγγραφή Χρήστη</h1>
+            <form onSubmit={handleSubmit} className={styles.form}>
                 <div>
-                    <label htmlFor="username">Username:</label>
                     <input
                         type="text"
                         id="username"
+                        placeholder="Όνομα Χρήστη"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        required
+                        className={styles.input}
                     />
                 </div>
                 <div>
-                    <label htmlFor="password">Password:</label>
                     <input
                         type={showPasswords ? "text" : "password"}
                         id="password"
+                        placeholder="Κωδικός Πρόσβασης"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
+                        className={styles.input}
                     />
                 </div>
                 <div>
-                    <label htmlFor="verifyPassword">Verify Password:</label>
                     <input
                         type={showPasswords ? "text" : "password"}
                         id="verifyPassword"
+                        placeholder="Επιβεβαίωση Κωδικού"
                         value={verifyPassword}
                         onChange={(e) => setVerifyPassword(e.target.value)}
-                        required
+                        className={styles.input}
                     />
                 </div>
-                <div>
+                <div className={styles.checkboxContainer}>
                     <input
                         type="checkbox"
                         id="showPasswords"
                         checked={showPasswords}
                         onChange={() => setShowPasswords(!showPasswords)}
+                        className={styles.checkbox}
                     />
-                    <label htmlFor="showPasswords">Show Passwords</label>
+                    <label className={styles.showPasswords} htmlFor="showPasswords">Εμφάνιση Κωδικών</label>
                 </div>
-                <button type="submit">Register</button>
+                <br/>
+                <button type="submit" className={styles.button}>Εγγραφή</button>
             </form>
-            {message && <p>{message}</p>}
+            {errors.length > 0 && (
+                <div className={styles.errors}>
+                    {errors.map((error, index) => (
+                        <p key={index} className={styles.error}>{error}</p>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
