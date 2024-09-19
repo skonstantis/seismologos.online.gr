@@ -68,7 +68,8 @@ const Register = () => {
     e.preventDefault();
 
     if (!recaptchaToken) {
-      setErrors(["Συμπληρώστε το ReCAPTCHA για να συνεχίσετε"]);
+      setErrors(errors.filter(error => !/ReCAPTCHA/i.test(error)));
+      setErrors(...errors, ["Συμπληρώστε το ReCAPTCHA για να συνεχίσετε"]);
     }
     
     if (errors.length > 0 || password !== verifyPassword || !recaptchaToken) {
