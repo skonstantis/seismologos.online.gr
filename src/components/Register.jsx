@@ -72,6 +72,8 @@ const Register = () => {
       setErrors(...errors, ["Συμπληρώστε το ReCAPTCHA για να συνεχίσετε"]);
     }
     
+    console.log(errors);
+    
     if (errors.length > 0 || password !== verifyPassword || !recaptchaToken) {
       return;
     }
