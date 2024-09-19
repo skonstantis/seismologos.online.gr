@@ -55,9 +55,6 @@ const Register = () => {
       if (password !== verifyPassword) {
         errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
       }
-
-      console.log(errorMessages);
-      console.log(recaptchaToken);
       
       if (!recaptchaToken) {
         errorMessages.push("Συμπληρώστε το ReCAPTCHA για να συνεχίσετε");
@@ -178,7 +175,10 @@ const Register = () => {
         <div className={styles.recaptchaContainer}>
           <ReCAPTCHA
             sitekey="6LewXkkqAAAAAGJ6SDrae3QLTqBF4wJ6eKO-Z3qD"
-            onChange={(token) => setRecaptchaToken(token)}
+            onChange={(token) => {
+              setRecaptchaToken(token);
+              setIsTyping(true);
+            }}
             onExpired={() => setRecaptchaToken(null)}
           />
         </div>
