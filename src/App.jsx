@@ -13,18 +13,18 @@ const App = () => {
       <div>
         <nav>
           <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/report">Report</Link></li>
-            <li><Link to="/register">Register</Link></li>
+            <li><Link to="/">Αρχική</Link></li>
+            <li><Link to="/login">Είσοδος</Link></li>
+            <li><Link to="/register">Εγγραφή</Link></li>
+            <li><Link to="/report">Αναφορά Σεισμού</Link></li>
           </ul>
         </nav>
 
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/report" element={<Report />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/report" element={<Report />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
