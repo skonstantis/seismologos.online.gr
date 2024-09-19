@@ -30,7 +30,7 @@ const Register = () => {
   const validateInput = async (username, password, verifyPassword, recaptchaToken) => {
     setIsTyping(false);
     setIsLoading(true);
-
+    
     try {
       const response = await fetch(
         "https://seismologos.onrender.com/validate/user",
@@ -55,7 +55,7 @@ const Register = () => {
       if (password !== verifyPassword) {
         errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
       }
-      
+
       if (!recaptchaToken) {
         errorMessages.push("Συμπληρώστε το ReCAPTCHA για να συνεχίσετε");
       }
@@ -179,7 +179,11 @@ const Register = () => {
               setRecaptchaToken(token);
               setIsTyping(true);
             }}
-            onExpired={() => setRecaptchaToken(null)}
+            onExpired={() => 
+              {
+                setRecaptchaToken(null);
+                validateInput(username, password, verifyPassword, null);
+              }}
           />
         </div>
         <br />
