@@ -66,18 +66,24 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    let newErrors = [...errors];
+  
     if (!recaptchaToken) {
-      setErrors(errors.filter(error => !/ReCAPTCHA/i.test(error)));
-      setErrors(...errors, ["Συμπληρώστε το ReCAPTCHA για να συνεχίσετε"]);
+      newErrors.push("Συμπληρώστε το ReCAPTCHA για να συνεχίσετε");
     }
-    
-    if (errors.length > 0 || password !== verifyPassword || !recaptchaToken) {
+  
+    if (password !== verifyPassword) {
+      newErrors.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
+    }
+  
+    if (newErrors.length > 0) {
+      setErrors(newErrors);
       return;
     }
-
+  
     setIsLoading(true);
-
+  
     try {
       const response = await fetch("https://seismologos.onrender.com/users", {
         method: "POST",
@@ -86,24 +92,15 @@ const Register = () => {
         },
         body: JSON.stringify({ username, password, recaptchaToken }),
       });
-
+  
       const result = await response.json();
-
+  
       if (response.ok) {
         navigate("/login");
       } else {
-        let errorMessages = [];
-
-        if (!response.ok) {
-          errorMessages = result.errors.map(
-            (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
-          );
-        }
-
-        if (password !== verifyPassword) {
-          errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
-        }
-
+        let errorMessages = result.errors.map(
+          (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
+        );
         setErrors(errorMessages);
       }
     } catch (error) {
@@ -111,7 +108,7 @@ const Register = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  };  
 
   return (
     <div className={styles.container}>
