@@ -1,0 +1,24 @@
+.notFoundContainer {
+  text-align: center;
+  padding: 50px;
+}
+
+.notFoundHeading {
+  font-size: 3rem;
+  color: #ff6f61;
+}
+
+.notFoundMessage {
+  font-size: 1.5rem;
+  margin: 20px 0;
+}
+
+.notFoundLink {
+  font-size: 1.2rem;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.notFoundLink:hover {
+  text-decoration: underline;
+}

@@ -12,6 +12,7 @@ const Register = () => {
   const [isTyping, setIsTyping] = useState(false);
 
   const navigate = useNavigate();
+  
   const typingTimeoutRef = useRef(null);
 
   useEffect(() => {
