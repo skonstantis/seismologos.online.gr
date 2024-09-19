@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import ReCAPTCHA from "react-google-recaptcha";
 import styles from "./register.module.css";
 
 const Register = () => {
@@ -10,9 +11,10 @@ const Register = () => {
   const [errors, setErrors] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   const navigate = useNavigate();
-  
+
   const typingTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -65,7 +67,11 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (errors.length > 0 || password !== verifyPassword) {
+    if (!recaptchaToken) {
+      setErrors(["Συμπληρώστε το ReCAPTCHA για να συνεχίσετε"]);
+    }
+    
+    if (errors.length > 0 || password !== verifyPassword || !recaptchaToken) {
       return;
     }
 
@@ -77,7 +83,7 @@ const Register = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, recaptchaToken }),
       });
 
       const result = await response.json();
@@ -164,6 +170,14 @@ const Register = () => {
           <label className={styles.showPasswords} htmlFor="showPasswords">
             Εμφάνιση Κωδικών
           </label>
+        </div>
+        <br/>
+        <div className={styles.recaptchaContainer}>
+          <ReCAPTCHA
+            sitekey="6LewXkkqAAAAAGJ6SDrae3QLTqBF4wJ6eKO-Z3qD"
+            onChange={(token) => setRecaptchaToken(token)}
+            onExpired={() => setRecaptchaToken(null)}
+          />
         </div>
         <br />
         <button type="submit" className={styles.button} disabled={isLoading}>
