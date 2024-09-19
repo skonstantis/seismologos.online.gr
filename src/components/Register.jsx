@@ -56,6 +56,9 @@ const Register = () => {
         errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
       }
 
+      console.log(errorMessages);
+      console.log(recaptchaToken);
+      
       if (!recaptchaToken) {
         errorMessages.push("Συμπληρώστε το ReCAPTCHA για να συνεχίσετε");
       }
