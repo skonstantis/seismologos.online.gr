@@ -21,13 +21,13 @@ const Register = () => {
     if (isTyping) {
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
-        validateInput(username, password, verifyPassword);
+        validateInput(username, password, verifyPassword, recaptchaToken);
       }, 1000);
     }
     return () => clearTimeout(typingTimeoutRef.current);
-  }, [username, password, verifyPassword]);
+  }, [username, password, verifyPassword, recaptchaToken]);
 
-  const validateInput = async (username, password, verifyPassword) => {
+  const validateInput = async (username, password, verifyPassword, recaptchaToken) => {
     setIsTyping(false);
     setIsLoading(true);
 
