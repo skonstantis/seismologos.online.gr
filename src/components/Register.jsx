@@ -174,7 +174,7 @@ const Register = () => {
         <br/>
         <div className={styles.recaptchaContainer}>
           <ReCAPTCHA
-            sitekey="6LewXkkqAAAAAGJ6SDrae3QLTqBF4wJ6eKO-Z3qD"
+            sitekey="6LeukkkqAAAAAF3cMjAqfU5PcQhLGVm31rVDj3dK"
             onChange={(token) => {
               setRecaptchaToken(token);
               setIsTyping(true);
