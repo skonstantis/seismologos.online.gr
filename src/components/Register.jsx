@@ -56,6 +56,10 @@ const Register = () => {
         errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
       }
 
+      if (!recaptchaToken) {
+        errorMessages.push("Συμπληρώστε το ReCAPTCHA για να συνεχίσετε");
+      }
+
       setErrors(errorMessages);
     } catch (error) {
       setErrors([`ERROR: ${error.message}`]);
@@ -66,14 +70,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    setErrors(errors.filter(error => !/ReCAPTCHA/i.test(error)));
-    if (!recaptchaToken) {
-      setErrors(...errors, ["Συμπληρώστε το ReCAPTCHA για να συνεχίσετε"]);
-    }
-    
-    console.log(errors);
-    
+
     if (errors.length > 0 || password !== verifyPassword || !recaptchaToken) {
       return;
     }
