@@ -6,6 +6,7 @@ import { validateInput } from "../js/register/validateInput";
 
 const Register = () => {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
   const [showPasswords, setShowPasswords] = useState(false);
@@ -22,14 +23,20 @@ const Register = () => {
     if (isTyping) {
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
-        validateInput(username, password, verifyPassword, recaptchaToken, setIsTyping, setIsLoading, setErrors);
+        validateInput(username, email, password, verifyPassword, recaptchaToken, setIsTyping, setIsLoading, setErrors);
       }, 1500);
     }
     return () => clearTimeout(typingTimeoutRef.current);
-  }, [username, password, verifyPassword, recaptchaToken]);
+  }, [username, email, password, verifyPassword, recaptchaToken]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (errors.length === 0 && (password !== verifyPassword || !recaptchaToken)) {
+      let errorMessages = [];
+      errorMessages.push("Η φόρμα είναι άδεια");
+      setErrors(errorMessages);
+    }
 
     if (errors.length > 0 || password !== verifyPassword || !recaptchaToken) {
       return;
@@ -43,7 +50,7 @@ const Register = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password, recaptchaToken }),
+        body: JSON.stringify({ username, email, password, recaptchaToken }),
       });
 
       const result = await response.json();
@@ -84,6 +91,20 @@ const Register = () => {
             value={username}
             onChange={(e) => {
               setUsername(e.target.value);
+              setIsTyping(true);
+            }}
+            className={styles.input}
+            disabled={isLoading}
+          />
+        </div>        
+        <div>
+          <input
+            type="text"
+            id="email"
+            placeholder="E-Mail"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
               setIsTyping(true);
             }}
             className={styles.input}
@@ -142,13 +163,17 @@ const Register = () => {
             onExpired={() => 
               {
                 setRecaptchaToken(null);
-                validateInput(username, password, verifyPassword, null);
+                validateInput(username, email, password, verifyPassword, null);
               }}
           />
         </div>
         <br />
-        <button type="submit" className={styles.button} disabled={isLoading}>
-          Εγγραφή
+        <button 
+          type="submit" 
+          className={`${styles.button} ${(isTyping || isLoading) ? styles.disabled : ""}`}
+          disabled={isLoading}
+        >
+          {(isTyping || isLoading) ? "Περiμένετε..." : "Εγγραφή"}
         </button>
       </form>
       {errors.length > 0 && (

@@ -1,4 +1,4 @@
-export const validateInput = async (username, password, verifyPassword, recaptchaToken, setIsTyping, setIsLoading, setErrors) => {
+export const validateInput = async (username, email, password, verifyPassword, recaptchaToken, setIsTyping, setIsLoading, setErrors) => {
   
     setIsTyping(false);
     setIsLoading(true);
@@ -11,7 +11,7 @@ export const validateInput = async (username, password, verifyPassword, recaptch
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ username, email, password }),
         }
       );
 

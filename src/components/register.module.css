@@ -71,3 +71,8 @@
     font-size: 12px;
     opacity: 0.8;
 }
+
+.button.disabled {
+    background-color: #9e9e9e;
+    cursor: not-allowed;
+}
