@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import styles from "./register.module.css";
+import { validateInput } from "../js/register/validateInput";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -15,58 +16,17 @@ const Register = () => {
 
   const navigate = useNavigate();
 
-  const typingTimeoutRef = useRef(null);
+  const typingTimeoutRef = useRef(null); 
 
   useEffect(() => {
     if (isTyping) {
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
-        validateInput(username, password, verifyPassword, recaptchaToken);
-      }, 1000);
+        validateInput(username, password, verifyPassword, recaptchaToken, setIsTyping, setIsLoading, setErrors);
+      }, 1500);
     }
     return () => clearTimeout(typingTimeoutRef.current);
   }, [username, password, verifyPassword, recaptchaToken]);
-
-  const validateInput = async (username, password, verifyPassword, recaptchaToken) => {
-    setIsTyping(false);
-    setIsLoading(true);
-    
-    try {
-      const response = await fetch(
-        "https://seismologos.onrender.com/validate/user",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        }
-      );
-
-      const result = await response.json();
-      let errorMessages = [];
-
-      if (!response.ok) {
-        errorMessages = await result.errors.map(
-          (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
-        );
-      }
-
-      if (password !== verifyPassword) {
-        errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
-      }
-
-      if (!recaptchaToken) {
-        errorMessages.push("Συμπληρώστε το ReCAPTCHA για να συνεχίσετε");
-      }
-
-      setErrors(errorMessages);
-    } catch (error) {
-      setErrors([`ERROR: ${error.message}`]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
