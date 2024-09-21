@@ -24,7 +24,7 @@ const Register = () => {
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
         validateInput(username, email, password, verifyPassword, recaptchaToken, setIsTyping, setIsLoading, setErrors);
-      }, 100);
+      }, 500);
     }
     return () => clearTimeout(typingTimeoutRef.current);
   }, [username, email, password, verifyPassword, recaptchaToken, isTyping, pendingRequest]);
