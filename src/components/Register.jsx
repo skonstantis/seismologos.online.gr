@@ -14,20 +14,20 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const [pendingRequest, setPendingRequest] = useState(false);
 
   const navigate = useNavigate();
-
   const typingTimeoutRef = useRef(null); 
 
   useEffect(() => {
-    if (isTyping) {
+    if (isTyping && !pendingRequest) { 
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
         validateInput(username, email, password, verifyPassword, recaptchaToken, setIsTyping, setIsLoading, setErrors);
-      }, 1500);
+      }, 100);
     }
     return () => clearTimeout(typingTimeoutRef.current);
-  }, [username, email, password, verifyPassword, recaptchaToken]);
+  }, [username, email, password, verifyPassword, recaptchaToken, isTyping, pendingRequest]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,6 +43,7 @@ const Register = () => {
     }
 
     setIsLoading(true);
+    setPendingRequest(true);
 
     try {
       const response = await fetch("https://seismologos.onrender.com/users", {
@@ -58,24 +59,17 @@ const Register = () => {
       if (response.ok) {
         navigate("/login");
       } else {
-        let errorMessages = [];
-
-        if (!response.ok) {
-          errorMessages = result.errors.map(
-            (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
-          );
-        }
-
+        let errorMessages = result.errors.map(err => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα");
         if (password !== verifyPassword) {
           errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
         }
-
         setErrors(errorMessages);
       }
     } catch (error) {
       setErrors([`ERROR: ${error.message}`]);
     } finally {
       setIsLoading(false);
+      setPendingRequest(false); 
     }
   };
 
@@ -94,7 +88,6 @@ const Register = () => {
               setIsTyping(true);
             }}
             className={styles.input}
-            disabled={isLoading}
           />
         </div>        
         <div>
@@ -108,7 +101,6 @@ const Register = () => {
               setIsTyping(true);
             }}
             className={styles.input}
-            disabled={isLoading}
           />
         </div>
         <div>
@@ -122,7 +114,6 @@ const Register = () => {
               setIsTyping(true);
             }}
             className={styles.input}
-            disabled={isLoading}
           />
         </div>
         <div>
@@ -136,7 +127,6 @@ const Register = () => {
               setIsTyping(true);
             }}
             className={styles.input}
-            disabled={isLoading}
           />
         </div>
         <div className={styles.checkboxContainer}>
@@ -146,13 +136,12 @@ const Register = () => {
             checked={showPasswords}
             onChange={() => setShowPasswords(!showPasswords)}
             className={styles.checkbox}
-            disabled={isLoading}
           />
           <label className={styles.showPasswords} htmlFor="showPasswords">
             Εμφάνιση Κωδικών
           </label>
         </div>
-        <br/>
+        <br />
         <div className={styles.recaptchaContainer}>
           <ReCAPTCHA
             sitekey="6LeukkkqAAAAAF3cMjAqfU5PcQhLGVm31rVDj3dK"
@@ -160,20 +149,19 @@ const Register = () => {
               setRecaptchaToken(token);
               setIsTyping(true);
             }}
-            onExpired={() => 
-              {
-                setRecaptchaToken(null);
-                validateInput(username, email, password, verifyPassword, null);
-              }}
+            onExpired={() => {
+              setRecaptchaToken(null);
+              validateInput(username, email, password, verifyPassword, null);
+            }}
           />
         </div>
         <br />
         <button 
           type="submit" 
-          className={`${styles.button} ${(isTyping || isLoading) ? styles.disabled : ""}`}
+          className={`${styles.button} ${isLoading ? styles.disabled : ""}`}
           disabled={isLoading}
         >
-          {(isTyping || isLoading) ? "Περiμένετε..." : "Εγγραφή"}
+          {isLoading ? "Περιμένετε..." : "Εγγραφή"}
         </button>
       </form>
       {errors.length > 0 && (
