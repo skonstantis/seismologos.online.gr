@@ -26,7 +26,7 @@ const Register = () => {
         setPendingRequest(true);
         await validateInput(username, email, password, verifyPassword, recaptchaToken, setIsTyping, setIsLoading, setErrors);
         setPendingRequest(false);
-      }, 10);
+      }, 100);
     }
     return () => clearTimeout(typingTimeoutRef.current);
   }, [username, email, password, verifyPassword, recaptchaToken, isTyping, pendingRequest]);
