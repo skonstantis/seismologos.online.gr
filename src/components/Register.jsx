@@ -20,11 +20,13 @@ const Register = () => {
   const typingTimeoutRef = useRef(null); 
 
   useEffect(() => {
-    if (isTyping && !pendingRequest) { 
+    if (isTyping && !pendingRequest) {
       clearTimeout(typingTimeoutRef.current);
-      typingTimeoutRef.current = setTimeout(() => {
-        validateInput(username, email, password, verifyPassword, recaptchaToken, setIsTyping, setIsLoading, setErrors);
-      }, 500);
+      typingTimeoutRef.current = setTimeout(async () => {
+        setPendingRequest(true);
+        await validateInput(username, email, password, verifyPassword, recaptchaToken, setIsTyping, setIsLoading, setErrors);
+        setPendingRequest(false);
+      }, 10);
     }
     return () => clearTimeout(typingTimeoutRef.current);
   }, [username, email, password, verifyPassword, recaptchaToken, isTyping, pendingRequest]);
