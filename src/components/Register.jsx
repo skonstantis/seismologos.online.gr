@@ -89,6 +89,7 @@ const Register = () => {
         <div className={styles.confirmationMessage}>
           <p>Ένας σύνδεσμος επιβεβαίωσης έχει σταλεί στο email σας.</p>
           <p>Θα μπορείτε να αποκτήσετε πρόσβαση στον λογαριασμό σας μόλις επιβεβαιώσετε το email σας.</p>
+          <p><strong>Σημαντικό:</strong> Έχετε <strong>7 ημέρες</strong> για να επιβεβαιώσετε το email σας. Μετά από 7 ημέρες, ο λογαριασμός σας θα διαγραφεί αυτόματα και θα πρέπει να δημιουργήσετε έναν νέο.</p>
           <button 
             className={styles.returnButton}
             onClick={() => navigate("/")}
