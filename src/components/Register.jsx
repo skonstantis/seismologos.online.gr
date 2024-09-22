@@ -15,7 +15,7 @@ const Register = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
   const [pendingRequest, setPendingRequest] = useState(false);
-  const [confirmationMessage, setConfirmationMessage] = useState(false); // New state for confirmation message
+  const [confirmationMessage, setConfirmationMessage] = useState(false); 
 
   const navigate = useNavigate();
   const typingTimeoutRef = useRef(null); 
@@ -87,9 +87,9 @@ const Register = () => {
       <h1 className={styles.heading}>Εγγραφή Χρήστη</h1>
       {confirmationMessage ? (
         <div className={styles.confirmationMessage}>
-          <p>Ένας σύνδεσμος επιβεβαίωσης έχει σταλεί στο email σας.</p>
-          <p>Θα μπορείτε να αποκτήσετε πρόσβαση στον λογαριασμό σας μόλις επιβεβαιώσετε το email σας.</p>
-          <p><strong>Σημαντικό:</strong> Έχετε <strong>7 ημέρες</strong> για να επιβεβαιώσετε το email σας. Μετά από 7 ημέρες, ο λογαριασμός σας θα διαγραφεί αυτόματα και θα πρέπει να δημιουργήσετε έναν νέο.</p>
+          <p>Ένας σύνδεσμος επιβεβαίωσης έχει σταλεί στο e-mail σας.</p>
+          <p>Θα μπορείτε να αποκτήσετε πρόσβαση στον λογαριασμό σας μόλις επιβεβαιώσετε το e-mail σας.</p>
+          <p><strong>Σημαντικό:</strong> Έχετε <strong>7 ημέρες</strong> για να επιβεβαιώσετε το e-mail σας. Μετά από 7 ημέρες, ο λογαριασμός σας θα διαγραφεί αυτόματα και θα πρέπει να δημιουργήσετε νέο.</p>
           <button 
             className={styles.returnButton}
             onClick={() => navigate("/")}
