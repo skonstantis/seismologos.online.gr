@@ -1,0 +1,52 @@
+.errors {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 350px; 
+    padding: 10px;
+    border: 1px solid #ff0000;
+    border-radius: 4px;
+    background-color: #ffe0e0;
+    text-align: center;
+    box-sizing: border-box;
+    z-index: 2;
+    color: red;
+  }
+  
+  .errors h2 {
+    margin: 0 0 10px;
+  }
+  
+  .error {
+    background-color: #ff0000;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+  }
+  
+  .errorNavigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .navArrow {
+    cursor: pointer;
+    font-size: 18px;
+    margin-left: 15px;
+    margin-right: 15px;
+    font-weight: bold;
+    color: rgb(255, 0, 0);
+  }
+  
+  .errorCount {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 0, 0, 0.2);
+    color: red;
+    font-weight: bolder;
+    padding: 5px;
+    border-radius: 4px;
+  }

@@ -54,19 +54,6 @@
   background-color: #57cd5d;
 }
 
-.errors {
-  margin-top: 15px;
-}
-
-.error {
-  background-color: red;
-  color: white;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 5px;
-  text-align: center;
-}
-
 .showPasswords {
   font-size: 12px;
   opacity: 0.8;

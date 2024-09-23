@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import styles from "./register.module.css";
 import { validateInput } from "../js/register/validateInput";
+import Errors from "./Errors"; 
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -11,14 +12,15 @@ const Register = () => {
   const [verifyPassword, setVerifyPassword] = useState("");
   const [showPasswords, setShowPasswords] = useState(false);
   const [errors, setErrors] = useState([]);
+  const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
   const [pendingRequest, setPendingRequest] = useState(false);
-  const [confirmationMessage, setConfirmationMessage] = useState(false); 
+  const [confirmationMessage, setConfirmationMessage] = useState(false);
 
   const navigate = useNavigate();
-  const typingTimeoutRef = useRef(null); 
+  const typingTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (isTyping && !pendingRequest) {
@@ -39,6 +41,7 @@ const Register = () => {
       let errorMessages = [];
       errorMessages.push("Η φόρμα είναι άδεια");
       setErrors(errorMessages);
+      setCurrentErrorIndex(0);
     }
 
     if (errors.length > 0 || password !== verifyPassword || !recaptchaToken) {
@@ -60,25 +63,28 @@ const Register = () => {
       const result = await response.json();
 
       if (response.ok) {
-        setConfirmationMessage(true); 
+        setConfirmationMessage(true);
         setUsername("");
         setEmail("");
         setPassword("");
         setVerifyPassword("");
         setRecaptchaToken(null);
-        setErrors([]); 
+        setErrors([]);
+        setCurrentErrorIndex(0);
       } else {
         let errorMessages = result.errors.map(err => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα");
         if (password !== verifyPassword) {
           errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
         }
         setErrors(errorMessages);
+        setCurrentErrorIndex(0);
       }
     } catch (error) {
       setErrors([`ERROR: ${error.message}`]);
+      setCurrentErrorIndex(0);
     } finally {
       setIsLoading(false);
-      setPendingRequest(false); 
+      setPendingRequest(false);
     }
   };
 
@@ -89,11 +95,11 @@ const Register = () => {
         <div className={styles.confirmationMessage}>
           <p>Ένας σύνδεσμος επιβεβαίωσης έχει σταλεί στο e-mail σας.</p>
           <p>Θα μπορείτε να αποκτήσετε πρόσβαση στον λογαριασμό σας μόλις επιβεβαιώσετε το e-mail σας.</p>
-          <p><strong>Σημαντικό:</strong> Έχετε <strong>7 ημέρες</strong> για να επιβεβαιώσετε το e-mail σας. Μετά από 7 ημέρες, ο λογαριασμός σας θα διαγραφεί αυτόματα και θα πρέπει να δημιουργήσετε νέο.</p>
-          <button 
-            className={styles.returnButton}
-            onClick={() => navigate("/")}
-          >
+          <p>
+            <strong>Σημαντικό:</strong> Έχετε <strong>7 ημέρες</strong> για να επιβεβαιώσετε το e-mail σας. Μετά από 7 ημέρες, ο
+            λογαριασμός σας θα διαγραφεί αυτόματα και θα πρέπει να δημιουργήσετε νέο.
+          </p>
+          <button className={styles.returnButton} onClick={() => navigate("/")}>
             Επιστροφή στην Αρχική
           </button>
         </div>
@@ -111,7 +117,7 @@ const Register = () => {
               }}
               className={styles.input}
             />
-          </div>        
+          </div>
           <div>
             <input
               type="text"
@@ -178,11 +184,7 @@ const Register = () => {
             />
           </div>
           <br />
-          <button 
-            type="submit" 
-            className={`${styles.button} ${isLoading ? styles.disabled : ""}`}
-            disabled={isLoading}
-          >
+          <button type="submit" className={`${styles.button} ${isLoading ? styles.disabled : ""}`} disabled={isLoading}>
             {isLoading ? "Περιμένετε..." : "Εγγραφή"}
           </button>
           <p className={styles.loginPrompt}>
@@ -190,15 +192,11 @@ const Register = () => {
           </p>
         </form>
       )}
-      {errors.length > 0 && (
-        <div className={styles.errors}>
-          {errors.map((error, index) => (
-            <p key={index} className={styles.error}>
-              {error}
-            </p>
-          ))}
-        </div>
-      )}
+      <Errors
+        errors={errors}
+        currentErrorIndex={currentErrorIndex}
+        setCurrentErrorIndex={setCurrentErrorIndex}
+      />
     </div>
   );
 };
