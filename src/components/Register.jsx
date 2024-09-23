@@ -173,7 +173,7 @@ const Register = () => {
               }}
               onExpired={() => {
                 setRecaptchaToken(null);
-                validateInput(username, email, password, verifyPassword, null);
+                validateInput(username, email, password, verifyPassword, null, setIsTyping, setIsLoading, setErrors);
               }}
             />
           </div>
