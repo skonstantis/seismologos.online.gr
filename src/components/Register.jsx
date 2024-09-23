@@ -184,8 +184,8 @@ const Register = () => {
             />
           </div>
           <br />
-          <button type="submit" className={`${styles.button} ${isLoading ? styles.disabled : ""}`} disabled={isLoading}>
-            {isLoading ? "Περιμένετε..." : "Εγγραφή"}
+          <button type="submit" className={`${styles.button} ${isLoading || errors.length != 0 ? isLoading ? styles.disabled : styles.error : ""}`} disabled={isLoading}>
+            {isLoading || errors.length != 0 ? isLoading ? "Περιμένετε..." : ("Διορθώστε " + (errors.length !== 1 ? "τα σφάλματα" : "το σφάλμα")) : "Εγγραφή"}
           </button>
           <p className={styles.loginPrompt}>
             Έχετε ήδη λογαριασμό; <a href="/Login" className={styles.loginLink}>Συνδεθείτε</a>

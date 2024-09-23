@@ -6,7 +6,7 @@ const Errors = ({ errors, currentErrorIndex, setCurrentErrorIndex }) => {
     if (errors.length > 0) {
       setCurrentErrorIndex(0);
     } else {
-      setCurrentErrorIndex(-1); 
+      setCurrentErrorIndex(-1);
     }
   }, [errors, setCurrentErrorIndex]);
 
@@ -26,16 +26,25 @@ const Errors = ({ errors, currentErrorIndex, setCurrentErrorIndex }) => {
 
   return (
     <div className={styles.errors}>
-      <h2>{errors.length} {errors.length !== 1 ? 'Σφάλματα' : 'Σφάλμα'}</h2>
+      <h2>
+        {errors.length} {errors.length !== 1 ? "Σφάλματα" : "Σφάλμα"}
+      </h2>
       <div className={styles.errorNavigation}>
-        <span onClick={handlePrevError} className={styles.navArrow}>
-          &lt;
-        </span>
-        <div className={styles.error}>{errors[currentErrorIndex]}</div>
-        <span onClick={handleNextError} className={styles.navArrow}>
-          &gt;
-        </span>
+        {errors.length > 1 && (
+          <span onClick={handlePrevError} className={styles.navArrow}>
+            &lt;
+          </span>
+        )}
+        <div className={styles.errorContainer}>
+          <div className={styles.error}>{errors[currentErrorIndex]}</div>
+        </div>
+        {errors.length > 1 && (
+          <span onClick={handleNextError} className={styles.navArrow}>
+            &gt;
+          </span>
+        )}
       </div>
+
       <div className={styles.errorCount}>
         {currentErrorIndex + 1} / {errors.length}
       </div>
