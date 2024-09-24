@@ -44,7 +44,7 @@ const Errors = ({ errors, currentErrorIndex, setCurrentErrorIndex }) => {
           </span>
         )}
       </div>
-
+      
       <div className={styles.errorCount}>
         {currentErrorIndex + 1} / {errors.length}
       </div>
