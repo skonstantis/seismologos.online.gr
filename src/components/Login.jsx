@@ -2,7 +2,10 @@ import React from 'react';
 
 const Login = () => { 
     return (
-        <h1>Είσοδος Χρήστη</h1>
+        <div>
+            <h1>Είσοδος Χρήστη</h1>
+            <p>Προσεχώς...</p>
+        </div>        
     );
 };
 
