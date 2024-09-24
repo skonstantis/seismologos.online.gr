@@ -3,7 +3,7 @@ import React from 'react';
 const Login = () => { 
     return (
         <div>
-            <h1>Είσοδος Χρήστη</h1>
+            <h1>Σύνδεση Χρήστη</h1>
             <p>Προσεχώς...</p>
         </div>        
     );

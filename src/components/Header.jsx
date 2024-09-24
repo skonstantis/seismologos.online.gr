@@ -20,14 +20,14 @@ const Header = () => {
         <ul>
           {isAuthPage && (
             <li>
-              <Link to="/">Αρχική</Link>
+              <Link to="/"><img className={styles.icons} src="../assets/home.svg" alt="Αρχική" /></Link>
             </li>
           )}
           <li>
-            <Link to="/login">Είσοδος</Link>
+            <Link to="/login"><p>Σύνδεση</p></Link>
           </li>
           <li>
-            <Link to="/register">Εγγραφή</Link>
+            <Link to="/register"><p></p>Εγγραφή</Link>
           </li>
         </ul>
         <a
