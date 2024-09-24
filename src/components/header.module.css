@@ -20,6 +20,13 @@
   text-decoration: none; 
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
   pointer-events: none;
+  
+}
+
+@media (max-width: 768px) {
+  .brandname {
+    display: none; 
+  }
 }
 
 .navLeft {
