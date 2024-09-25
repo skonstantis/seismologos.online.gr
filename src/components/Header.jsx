@@ -15,6 +15,9 @@ const Header = () => {
           <img className={styles.logo} src="../assets/logo.svg" alt="Αρχική" />
         </Link>
         <h1 className={styles.brandname}>Seismologos.gr</h1>
+          <div className={styles.banner}>
+            <p className={styles.bannerText}>Ζωντανά η σεισμικότητα</p>
+          </div>
       </div>
       <div className={styles.navRight}>
         <ul>

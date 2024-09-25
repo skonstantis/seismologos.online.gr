@@ -23,12 +23,6 @@
   
 }
 
-@media (max-width: 768px) {
-  .brandname {
-    display: none; 
-  }
-}
-
 .navLeft {
   display: flex;
   align-items: center;
@@ -70,4 +64,28 @@ li a:hover {
 {
   height: 20px;
   margin-top: 15px;
+}
+
+.banner
+{
+  margin-top: 5px;
+  margin-left: 10px;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.bannerText
+{
+  margin: 5px;
+  color: rgb(18, 31, 65);
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .brandname,
+  .banner {
+    display: none; 
+  }
 }
