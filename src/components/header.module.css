@@ -5,6 +5,7 @@
   padding: 5px 10px;
   background-color: rgb(18, 31, 65);
   height: 45px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .logo {
@@ -18,7 +19,7 @@
   margin: 0;
   color: white;
   text-decoration: none; 
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 4px 3px rgba(0,0,0,0.2);
   pointer-events: none;
   
 }
@@ -48,7 +49,7 @@ li {
 li a {
   color: white;
   text-decoration: none; 
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 4px 3px rgba(0,0,0,0.2);
 }
 
 li a:hover {
@@ -68,18 +69,18 @@ li a:hover {
 
 .banner
 {
-  margin-top: 5px;
+  margin-top: 2px;
   margin-left: 10px;
   border-radius: 10px;
   background-color: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .bannerText
 {
   margin: 5px;
   color: rgb(18, 31, 65);
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 4px 3px rgba(0,0,0,0.2);
   font-weight: bold;
 }
 
