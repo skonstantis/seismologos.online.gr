@@ -18,6 +18,7 @@ const Register = () => {
   const [recaptchaToken, setRecaptchaToken] = useState(null);
   const [pendingRequest, setPendingRequest] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState(false);
+  const [agree, setAgree] = useState(false);
 
   const navigate = useNavigate();
   const typingTimeoutRef = useRef(null);
@@ -33,6 +34,7 @@ const Register = () => {
           password,
           verifyPassword,
           recaptchaToken,
+          agree, 
           setIsTyping,
           setIsLoading,
           setErrors
@@ -47,30 +49,30 @@ const Register = () => {
     password,
     verifyPassword,
     recaptchaToken,
+    agree, 
     isTyping,
     pendingRequest,
-  ]);
+  ]);  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (
       errors.length === 0 &&
-      (password !== verifyPassword || !recaptchaToken)
+      (password !== verifyPassword || !recaptchaToken || !agree) 
     ) {
-      let errorMessages = [];
-      errorMessages.push("Η φόρμα είναι άδεια");
+      let errorMessages = ["Η φόρμα είναι άδεια"];
       setErrors(errorMessages);
       setCurrentErrorIndex(0);
     }
-
-    if (errors.length > 0 || password !== verifyPassword || !recaptchaToken) {
+  
+    if (errors.length > 0 || password !== verifyPassword || !recaptchaToken || !agree) {
       return;
     }
-
+  
     setIsLoading(true);
     setPendingRequest(true);
-
+  
     try {
       const response = await fetch("https://seismologos.onrender.com/users", {
         method: "POST",
@@ -79,9 +81,9 @@ const Register = () => {
         },
         body: JSON.stringify({ username, email, password, recaptchaToken }),
       });
-
+  
       const result = await response.json();
-
+  
       if (response.ok) {
         setConfirmationMessage(true);
         setUsername("");
@@ -98,6 +100,9 @@ const Register = () => {
         if (password !== verifyPassword) {
           errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
         }
+        if (!agree) {
+          errorMessages.push("Αποδεχθείτε τους Όρους Χρήσης και την Πολιτική Απορρήτου για να συνεχίσετε");
+        }
         setErrors(errorMessages);
         setCurrentErrorIndex(0);
       }
@@ -108,7 +113,7 @@ const Register = () => {
       setIsLoading(false);
       setPendingRequest(false);
     }
-  };
+  };  
 
   return (
     <div className={styles.wrap}>
@@ -199,7 +204,42 @@ const Register = () => {
                 Εμφάνιση Κωδικών
               </label>
             </div>
-            <br />
+            <div>
+              <br />
+            </div>
+            <span>
+              <input
+                type="checkbox"
+                onChange={() => {
+                  setAgree(!agree);
+                  setIsTyping(true);
+                }}
+                className={styles.checkbox}
+              />
+              <label className={styles.agree}>
+                Συμφωνώ με τους{" "}
+                <a
+                  href="/terms-of-service"
+                  className={styles.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <b>Όρους Χρήσης</b>
+                </a>{" "}
+                και την{" "}
+                <a
+                  href="/privacy-policy"
+                  className={styles.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <b>Πολιτική Απορρήτου</b>
+                </a>
+              </label>
+            </span>
+            <div>
+              <br />
+            </div>
             <div className={styles.recaptchaContainer}>
               <ReCAPTCHA
                 sitekey="6LeukkkqAAAAAF3cMjAqfU5PcQhLGVm31rVDj3dK"
@@ -215,6 +255,7 @@ const Register = () => {
                     password,
                     verifyPassword,
                     null,
+                    agree,
                     setIsTyping,
                     setIsLoading,
                     setErrors
@@ -222,11 +263,13 @@ const Register = () => {
                 }}
               />
             </div>
-            <br />
+            <div>
+              <br />
+            </div>
             <button
               type="submit"
               className={`${styles.button} ${
-                isLoading || errors.length != 0
+                isLoading || errors.length !== 0
                   ? isLoading
                     ? styles.disabled
                     : styles.error
@@ -234,7 +277,7 @@ const Register = () => {
               }`}
               disabled={isLoading}
             >
-              {isLoading || errors.length != 0
+              {isLoading || errors.length !== 0
                 ? isLoading
                   ? "Περιμένετε..."
                   : "Διορθώστε " +
@@ -243,8 +286,8 @@ const Register = () => {
             </button>
             <p className={styles.loginPrompt}>
               Έχετε ήδη λογαριασμό;{" "}
-              <a href="/Login" className={styles.loginLink}>
-                Συνδεθείτε
+              <a href="/login" className={styles.link}>
+                <b>Συνδεθείτε</b>
               </a>
             </p>
           </form>

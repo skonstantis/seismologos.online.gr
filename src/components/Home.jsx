@@ -3,8 +3,7 @@ import React from 'react';
 const Home = () => {
   return (
     <div>
-      <h1>Αρχική</h1>
-      <p>Προσεχώς...</p>
+      <h1>Αρχική todo page</h1>
     </div>
   );
 };

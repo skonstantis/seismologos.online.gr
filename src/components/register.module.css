@@ -58,6 +58,10 @@
   margin-right: 5px;
 }
 
+.agree{
+  font-size: 16px;
+}
+
 .button {
   background-color: #4caf50;
   color: white;
@@ -81,7 +85,7 @@
 }
 
 .showPasswords {
-  font-size: 12px;
+  font-size: 14px;
   opacity: 0.8;
 }
 
@@ -122,11 +126,11 @@
   font-size: 14px;
 }
 
-.loginLink {
+.link {
   color: blue;
   text-decoration: none;
 }
 
-.loginLink:hover {
+.link:hover {
   text-decoration: underline;
 }
