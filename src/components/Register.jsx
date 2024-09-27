@@ -6,6 +6,10 @@ import { validateInput } from "../js/register/validateInput";
 import Errors from "./Errors";
 
 const Register = () => {
+  useEffect(() => {
+    document.title = "Εγγραφή Χρήστη";
+  }, []);
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
