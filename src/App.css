@@ -1,7 +1,10 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   background-color: gray;
   overflow-x: hidden;
   user-select: none;
+  text-shadow: 2px 4px 3px rgba(0, 0, 0, 0.2);
+  color: rgb(18, 31, 65);
 }

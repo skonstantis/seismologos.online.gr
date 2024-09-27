@@ -1,24 +1,20 @@
 .notFoundContainer {
+  position: absolute;
+  color: white;
   text-align: center;
-  padding: 50px;
+  width: 100%;
+  background-color: rgb(18, 31, 65);
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .notFoundHeading {
-  font-size: 3rem;
-  color: #ff6f61;
+  color: red;
+  font-size: 40px;
+  font-weight: bolder;
 }
 
 .notFoundMessage {
-  font-size: 1.5rem;
+  font-size: 16px;
   margin: 20px 0;
-}
-
-.notFoundLink {
-  font-size: 1.2rem;
-  color: #007bff;
-  text-decoration: none;
-}
-
-.notFoundLink:hover {
-  text-decoration: underline;
 }
