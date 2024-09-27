@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 const Login = () => { 
     useEffect(() => {
-        document.title = "Είσοδος Χρήστη";
+        document.title = "Σύνδεση Χρήστη";
       }, []);
 
     return (
