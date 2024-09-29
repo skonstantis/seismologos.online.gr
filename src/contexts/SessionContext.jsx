@@ -99,13 +99,14 @@ const Notification = ({ message }) => {
 
 const notificationStyle = {
     position: 'fixed',
-    bottom: '20px',
+    bottom: '25px',
     left: '50%',
     transform: 'translateX(-50%)',
     backgroundColor: 'green',
     color: 'white',
     padding: '3px',
     borderRadius: '5px',
+    fontSize: '14px',
     zIndex: 1000,
     transition: 'opacity 0.5s ease-in-out',
     opacity: 0.9,
