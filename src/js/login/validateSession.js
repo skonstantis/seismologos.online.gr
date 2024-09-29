@@ -28,6 +28,7 @@ export const validateSession = async () => {
     localStorage.setItem("email", result.user.email);
     localStorage.setItem("id", result.user.id);
     localStorage.setItem("lastLogin", result.user.lastLogin); 
+    console.log(result.user.lastLogin);
     return true;
   } catch (error) {
     console.error(error);
