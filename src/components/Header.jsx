@@ -1,12 +1,17 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useSession } from "../contexts/SessionContext"; 
 import styles from "./header.module.css";
 
 const Header = () => {
   const location = useLocation();
+  const { sessionValid, loading } = useSession();
 
-  const isAuthPage =
-    location.pathname !== "/";
+  const isAuthPage = location.pathname !== "/";
+
+  if (loading) {
+    return null; 
+  }
 
   return (
     <nav className={styles.header}>
@@ -15,23 +20,29 @@ const Header = () => {
           <img className={styles.logo} src="../assets/logo.svg" alt="Αρχική" />
         </Link>
         <h1 className={styles.brandname}>Seismologos.gr</h1>
-          <div className={styles.banner}>
-            <p className={styles.bannerText}>Ζωντανά η σεισμικότητα</p>
-          </div>
+        <div className={styles.banner}>
+          <p className={styles.bannerText}>Ζωντανά η σεισμικότητα</p>
+        </div>
       </div>
       <div className={styles.navRight}>
         <ul>
-          {isAuthPage && (
+          {isAuthPage && ( 
             <li>
-              <Link to="/"><img className={styles.icons} src="../assets/home.svg" alt="Αρχική" /></Link>
+              <Link to="/">
+                <img className={styles.icons} src="../assets/home.svg" alt="Αρχική" />
+              </Link>
             </li>
           )}
-          <li>
-            <Link to="/login"><p>Σύνδεση</p></Link>
-          </li>
-          <li>
-            <Link to="/register"><p></p>Εγγραφή</Link>
-          </li>
+          {!loading && !sessionValid && ( 
+            <>
+              <li>
+                <Link to="/login"><p>Σύνδεση</p></Link>
+              </li>
+              <li>
+                <Link to="/register"><p>Εγγραφή</p></Link>
+              </li>
+            </>
+          )}
         </ul>
         <a
           href="https://x.com/seismologos"

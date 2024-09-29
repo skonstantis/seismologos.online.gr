@@ -1,9 +1,8 @@
-import React from "react";
-import { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSession } from "../contexts/SessionContext"; 
 import styles from "./login.module.css";
 import Errors from "./Errors";
-import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   useEffect(() => {
@@ -11,7 +10,15 @@ const Login = () => {
   }, []);
 
   const navigate = useNavigate();
-  const [key, setkey] = useState("");
+  const { sessionValid, loading } = useSession(); 
+
+  useEffect(() => {
+    if (sessionValid) {
+      navigate("/"); 
+    }
+  }, [sessionValid, navigate]); 
+
+  const [key, setKey] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -20,7 +27,6 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setIsLoading(true);
 
     try {
@@ -38,12 +44,15 @@ const Login = () => {
       const result = await response.json();
 
       if (response.ok) {
-        setkey("");
+        setKey("");
         setPassword("");
         setErrors([]);
         setCurrentErrorIndex(0);
         localStorage.setItem("authToken", result.token); 
-        navigate("/");
+        localStorage.setItem("username", result.user.username); 
+        localStorage.setItem("email", result.user.email); 
+        localStorage.setItem("id", result.user.id); 
+        window.location.reload();
       } else {
         let errorMessages = result.errors.map(
           (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
@@ -58,6 +67,15 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  if (loading) {
+    return null;
+  }
+
+  if (sessionValid) {
+    return null; 
+  }
+
   return (
     <div className={styles.wrap}>
       <div className={styles.container}>
@@ -70,7 +88,7 @@ const Login = () => {
               placeholder="Όνομα Χρήστη ή e-mail"
               value={key}
               onChange={(e) => {
-                setkey(e.target.value);
+                setKey(e.target.value);
               }}
               className={styles.input}
             />

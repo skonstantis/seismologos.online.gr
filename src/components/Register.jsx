@@ -4,12 +4,16 @@ import ReCAPTCHA from "react-google-recaptcha";
 import styles from "./register.module.css";
 import { validateInput } from "../js/register/validateInput";
 import Errors from "./Errors";
+import { useSession } from "../contexts/SessionContext"; 
 
 const Register = () => {
   useEffect(() => {
     document.title = "Εγγραφή Χρήστη";
   }, []);
 
+  const { sessionValid, loading } = useSession(); 
+  const navigate = useNavigate();
+  
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,8 +28,13 @@ const Register = () => {
   const [confirmationMessage, setConfirmationMessage] = useState(false);
   const [agree, setAgree] = useState(false);
 
-  const navigate = useNavigate();
   const typingTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (sessionValid) {
+      navigate("/"); 
+    }
+  }, [sessionValid, navigate]);
 
   useEffect(() => {
     if (isTyping && !pendingRequest) {
@@ -118,6 +127,14 @@ const Register = () => {
       setPendingRequest(false);
     }
   };  
+
+  if (loading) {
+    return null;
+  }
+
+  if (sessionValid) {
+    return null; 
+  }
 
   return (
     <div className={styles.wrap}>

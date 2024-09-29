@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useSession } from "../contexts/SessionContext";
 import styles from "./footer.module.css";
 
 const Footer = () => {
@@ -7,6 +8,12 @@ const Footer = () => {
     const options = { timeZone: "Europe/Athens", year: "numeric" };
     return new Intl.DateTimeFormat("en-US", options).format(new Date());
   };
+
+  const { sessionValid, loading } = useSession();
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <div className={styles.footer}>
