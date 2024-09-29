@@ -29,7 +29,7 @@ const App = () => {
 const MainRoutes = () => {
   const { sessionValid, loading } = useSession();
 
-  if (loading) {
+  if (loading ) {
     return <Loading />;
   }
 
