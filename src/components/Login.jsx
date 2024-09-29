@@ -52,6 +52,7 @@ const Login = () => {
         localStorage.setItem("username", result.user.username); 
         localStorage.setItem("email", result.user.email); 
         localStorage.setItem("id", result.user.id); 
+        localStorage.setItem("lastLogin", result.user.lastLogin); 
         window.location.reload();
       } else {
         let errorMessages = result.errors.map(
