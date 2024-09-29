@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { validateSession } from '../js/login/validateSession'; 
 
 const SessionContext = createContext();
@@ -11,6 +11,7 @@ export const SessionProvider = ({ children }) => {
   const [sessionValid, setSessionValid] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState(""); 
+  const timeoutIdRef = useRef(null); 
 
   const formatTimestamp = (timestamp) => {
     const date = new Date(Number(timestamp)); 
@@ -60,9 +61,13 @@ export const SessionProvider = ({ children }) => {
 
     setLoading(false);
 
+    if (timeoutIdRef.current) {
+      clearTimeout(timeoutIdRef.current);
+    }
+
     setTimeout(() => setNotification(""), 3000);
 
-    setTimeout(() => checkSession(true), 30 * 60 * 1000);
+    timeoutIdRef.current = setTimeout(() => checkSession(true), 30 * 60 * 1000);
   };
 
   useEffect(() => {
@@ -70,6 +75,9 @@ export const SessionProvider = ({ children }) => {
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+        }
         checkSession();
       }
     };
@@ -78,6 +86,9 @@ export const SessionProvider = ({ children }) => {
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current); 
+      }
     };
   }, []);
 
@@ -98,23 +109,22 @@ const Notification = ({ message }) => {
 };
 
 const notificationStyle = {
-    position: 'fixed',
-    bottom: '25px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    backgroundColor: 'green',
-    color: 'white',
-    padding: '3px',
-    borderRadius: '5px',
-    fontSize: '14px',
-    zIndex: 1000,
-    transition: 'opacity 0.5s ease-in-out',
-    opacity: 0.9,
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)', 
-    textAlign: 'center',
-    lineHeight: '1.5',
-    fontWeight : 'bold'
-  };
-  
+  position: 'fixed',
+  bottom: '25px',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  backgroundColor: 'green',
+  color: 'white',
+  padding: '3px',
+  borderRadius: '5px',
+  fontSize: '14px',
+  zIndex: 1000,
+  transition: 'opacity 0.5s ease-in-out',
+  opacity: 0.9,
+  boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)', 
+  textAlign: 'center',
+  lineHeight: '1.5',
+  fontWeight: 'bold'
+};
 
 export default SessionProvider;
