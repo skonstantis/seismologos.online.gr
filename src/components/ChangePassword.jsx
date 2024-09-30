@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import styles from './changePassword.module.css'; 
-import Errors from './Errors';
-import Loading from './Loading';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import styles from "./changePassword.module.css";
+import Errors from "./Errors";
+import Loading from "./Loading";
 
 const ChangePassword = () => {
   const [showForm, setShowForm] = useState(false);
-  const [password, setPassword] = useState('');
-  const [verifyPassword, setVerifyPassword] = useState('');
+  const [password, setPassword] = useState("");
+  const [verifyPassword, setVerifyPassword] = useState("");
   const [showPasswords, setShowPasswords] = useState(false);
   const [errors, setErrors] = useState([]);
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
@@ -22,26 +22,28 @@ const ChangePassword = () => {
   useEffect(() => {
     const verifyToken = async () => {
       const params = new URLSearchParams(location.search);
-      const token = params.get('token');
+      const token = params.get("token");
 
       if (!token) {
-        setErrors(['Token is missing']);
+        setErrors(["Token is missing"]);
         return;
       }
 
       try {
-        const response = await fetch(`https://seismologos.onrender.com/validate/change-password?token=${token}`);
+        const response = await fetch(
+          `https://seismologos.onrender.com/validate/change-password?token=${token}`
+        );
         const result = await response.json();
         if (response.ok) {
           setShowForm(true);
         } else {
-            let errorMessages = result.errors.map(
-                (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
-            );
-            setErrors(errorMessages);
+          let errorMessages = result.errors.map(
+            (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
+          );
+          setErrors(errorMessages);
         }
       } catch (error) {
-        setErrors(['An error occurred while verifying the token.']);
+        setErrors(["An error occurred while verifying the token."]);
       }
     };
 
@@ -50,30 +52,39 @@ const ChangePassword = () => {
 
   const handlePasswordChange = async (event) => {
     event.preventDefault();
+
+    if (password != verifyPassword) {
+      setErrors(["Οι κωδικοί πρόσβασης δεν ταιριάζουν"]);
+      return;
+    }
+
     setIsLoading(true);
 
     const params = new URLSearchParams(location.search);
-    const token = params.get('token');
+    const token = params.get("token");
 
     try {
-      const response = await fetch('https://seismologos.onrender.com/validate/change-password-validated', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token, password }),
-      });
+      const response = await fetch(
+        "https://seismologos.onrender.com/validate/change-password-validated",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token, password }),
+        }
+      );
 
       const result = await response.json();
       if (response.ok && password == verifyPassword) {
         setErrors([]);
-        navigate('/login');
+        navigate("/login");
       } else {
         let errorMessages = result.errors.map(
-            (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
+          (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
         );
         if (password !== verifyPassword) {
-            errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
+          errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
         }
         setErrors(errorMessages);
       }
@@ -96,7 +107,7 @@ const ChangePassword = () => {
           <form onSubmit={handlePasswordChange} className={styles.form}>
             <div>
               <input
-                type={showPasswords ? 'text' : 'password'}
+                type={showPasswords ? "text" : "password"}
                 name="password"
                 placeholder="Νέος Κωδικός Πρόσβασης"
                 value={password}
@@ -106,7 +117,7 @@ const ChangePassword = () => {
             </div>
             <div>
               <input
-                type={showPasswords ? 'text' : 'password'}
+                type={showPasswords ? "text" : "password"}
                 name="verifyPassword"
                 placeholder="Επιβεβαίωση Κωδικού"
                 value={verifyPassword}
@@ -126,17 +137,27 @@ const ChangePassword = () => {
                 Εμφάνιση Κωδικών
               </label>
             </div>
-            <div><br/></div>
+            <div>
+              <br />
+            </div>
             <button
               type="submit"
-              className={`${styles.button} ${isLoading && errors.length !== 0 ? styles.disabled : ''}`}
+              className={`${styles.button} ${
+                isLoading && errors.length !== 0 ? styles.disabled : ""
+              }`}
               disabled={isLoading}
             >
-              {isLoading && errors.length !== 0 ? 'Παρακαλώ Περιμένετε...' : 'Αλλαγή Κωδικού'}
+              {isLoading && errors.length !== 0
+                ? "Παρακαλώ Περιμένετε..."
+                : "Αλλαγή Κωδικού"}
             </button>
           </form>
         )}
-        <Errors errors={errors} currentErrorIndex={currentErrorIndex} setCurrentErrorIndex={setCurrentErrorIndex} />
+        <Errors
+          errors={errors}
+          currentErrorIndex={currentErrorIndex}
+          setCurrentErrorIndex={setCurrentErrorIndex}
+        />
       </div>
     </div>
   );
