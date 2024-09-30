@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSession } from "../contexts/SessionContext"; 
+import { useSession } from "../contexts/SessionContext";
 import styles from "./login.module.css";
 import Errors from "./Errors";
+import Loading from "./Loading";
 
 const Login = () => {
   useEffect(() => {
@@ -10,13 +11,13 @@ const Login = () => {
   }, []);
 
   const navigate = useNavigate();
-  const { sessionValid, loading } = useSession(); 
+  const { sessionValid, loading } = useSession();
 
   useEffect(() => {
     if (sessionValid) {
-      navigate("/"); 
+      navigate("/");
     }
-  }, [sessionValid, navigate]); 
+  }, [sessionValid, navigate]);
 
   const [key, setKey] = useState("");
   const [password, setPassword] = useState("");
@@ -24,10 +25,12 @@ const Login = () => {
   const [errors, setErrors] = useState([]);
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setIsAuthenticating(true);
 
     try {
       const response = await fetch(
@@ -48,11 +51,11 @@ const Login = () => {
         setPassword("");
         setErrors([]);
         setCurrentErrorIndex(0);
-        localStorage.setItem("authToken", result.token); 
-        localStorage.setItem("username", result.user.username); 
-        localStorage.setItem("email", result.user.email); 
-        localStorage.setItem("id", result.user.id); 
-        localStorage.setItem("lastLogin", result.user.lastLogin); 
+        localStorage.setItem("authToken", result.token);
+        localStorage.setItem("username", result.user.username);
+        localStorage.setItem("email", result.user.email);
+        localStorage.setItem("id", result.user.id);
+        localStorage.setItem("lastLogin", result.user.lastLogin);
         window.location.reload();
       } else {
         let errorMessages = result.errors.map(
@@ -66,6 +69,7 @@ const Login = () => {
       setCurrentErrorIndex(0);
     } finally {
       setIsLoading(false);
+      setIsAuthenticating(false); 
     }
   };
 
@@ -74,7 +78,11 @@ const Login = () => {
   }
 
   if (sessionValid) {
-    return null; 
+    return null;
+  }
+
+  if (isAuthenticating) {
+    return <Loading/>; 
   }
 
   return (
