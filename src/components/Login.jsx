@@ -69,7 +69,6 @@ const Login = () => {
       setCurrentErrorIndex(0);
     } finally {
       setIsLoading(false);
-      setIsAuthenticating(false); 
     }
   };
 
