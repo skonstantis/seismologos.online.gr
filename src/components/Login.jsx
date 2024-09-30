@@ -58,6 +58,7 @@ const Login = () => {
         localStorage.setItem("lastLogin", result.user.lastLogin);
         window.location.reload();
       } else {
+        setIsAuthenticating(false);
         let errorMessages = result.errors.map(
           (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
         );
