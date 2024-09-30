@@ -13,6 +13,7 @@ import NotFound from './components/NotFound';
 import { SessionProvider, useSession } from './contexts/SessionContext'; 
 import "./App.css";
 import Loading from './components/Loading';
+import ChangePassword from './components/ChangePassword';
 
 const App = () => {
   return (
@@ -42,6 +43,7 @@ const MainRoutes = () => {
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/contact-us" element={<ContactUs />} />
       <Route path="/faq" element={<Faq />} />
+      <Route path="/change-password" element={<ChangePassword />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
