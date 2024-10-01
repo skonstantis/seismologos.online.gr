@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSession } from "../contexts/SessionContext";
+import { forceLogout } from "../js/logout/forceLogout";
 import styles from "./changePassword.module.css";
 import Errors from "./Errors";
 import Loading from "./Loading";
@@ -9,6 +11,18 @@ const ChangePassword = () => {
   useEffect(() => {
     document.title = "Αλλαγή Κωδικού";
   }, []);
+  
+  const { sessionValid, loading } = useSession();
+
+  useEffect(() => {
+    const checkAndLogout = async () => {
+      if (sessionValid) {
+        await forceLogout();
+        window.location.reload();
+      }
+    };
+    checkAndLogout();
+  }, [sessionValid, forceLogout]);
 
   const [showForm, setShowForm] = useState(false);
   const [password, setPassword] = useState("");
