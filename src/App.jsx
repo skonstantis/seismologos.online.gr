@@ -15,6 +15,7 @@ import "./App.css";
 import Loading from './components/Loading';
 import ChangePassword from './components/ChangePassword';
 import ForgotPassword from './components/ForgotPassword';
+import Logout from './components/Logout';
 
 const App = () => {
   return (
@@ -46,6 +47,7 @@ const MainRoutes = () => {
       <Route path="/faq" element={<Faq />} />
       <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/logout" element={<Logout />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

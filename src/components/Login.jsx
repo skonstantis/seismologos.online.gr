@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 import styles from "./login.module.css";
 import Errors from "./Errors";
@@ -11,13 +11,8 @@ const Login = () => {
   }, []);
 
   const navigate = useNavigate();
+  const location = useLocation();  
   const { sessionValid, loading } = useSession();
-
-  useEffect(() => {
-    if (sessionValid) {
-      navigate("/");
-    }
-  }, [sessionValid, navigate]);
 
   const [key, setKey] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +20,21 @@ const Login = () => {
   const [errors, setErrors] = useState([]);
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [isAuthenticating, setIsAuthenticating] = useState(false); 
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [verifiedMessage, setVerifiedMessage] = useState(false); 
+
+  useEffect(() => {
+    if (sessionValid) {
+      navigate("/");
+    }
+  }, [sessionValid, navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('verified') === 'true') {
+      setVerifiedMessage(true);
+    }
+  }, [location.search]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,13 +91,18 @@ const Login = () => {
   }
 
   if (isAuthenticating) {
-    return <Loading/>; 
+    return <Loading />;
   }
 
   return (
     <div className={styles.wrap}>
       <div className={styles.container}>
         <h1 className={styles.heading}>Σύνδεση Χρήστη</h1>
+        {verifiedMessage && (
+          <div className={styles.verificationMessage}>
+            <p>Η διεύθυνση e-mail σας έχει επιβεβαιωθεί.<br/>Μπορείτε τώρα να συνδεθείτε.</p>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className={styles.form}>
           <div>
             <input
@@ -131,9 +145,7 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className={`${styles.button} ${
-              isLoading && errors.length !== 0 ? styles.disabled : ""
-            }`}
+            className={`${styles.button} ${isLoading && errors.length !== 0 ? styles.disabled : ""}`}
             disabled={isLoading}
           >
             {isLoading && errors.length !== 0 ? "Περιμένετε..." : "Σύνδεση"}

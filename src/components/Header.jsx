@@ -30,6 +30,16 @@ const AuthLinks = () => (
   </>
 );
 
+const LoggedInLinks = () => (
+  <>
+    <li>
+      <Link to="/logout">
+        <p>Αποσύνδεση</p>
+      </Link>
+    </li>
+  </>
+);
+
 const HomeLink = () => (
   <li>
     <Link to="/">
@@ -64,6 +74,7 @@ const Header = () => {
         <ul>
           {isAuthPage && <HomeLink />}
           {!loading && !sessionValid && <AuthLinks />}
+          {!loading && sessionValid && <LoggedInLinks />}
         </ul>
         <SocialLink />
       </div>

@@ -4,7 +4,7 @@ import styles from "./forgotPassword.module.css";
 import Errors from "./Errors";
 import Loading from "./Loading";
 
-const ChangePassword = () => {
+const ForgotPassword = () => {
   useEffect(() => {
     document.title = "Ξέχασα τον Κωδικό Πρόσβασης μου";
   }, []);
@@ -104,4 +104,4 @@ const ChangePassword = () => {
   );
 };
 
-export default ChangePassword;
+export default ForgotPassword;
