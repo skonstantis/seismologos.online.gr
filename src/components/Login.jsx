@@ -22,6 +22,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [verifiedMessage, setVerifiedMessage] = useState(false); 
+  const [changedPasswordMessage, setChangedPasswordMessage] = useState(false); 
 
   useEffect(() => {
     if (sessionValid) {
@@ -33,6 +34,9 @@ const Login = () => {
     const params = new URLSearchParams(location.search);
     if (params.get('verified') === 'true') {
       setVerifiedMessage(true);
+    }
+    if (params.get('changedPassword') === 'true') {
+      setChangedPasswordMessage(true);
     }
   }, [location.search]);
 
@@ -99,8 +103,13 @@ const Login = () => {
       <div className={styles.container}>
         <h1 className={styles.heading}>Σύνδεση Χρήστη</h1>
         {verifiedMessage && (
-          <div className={styles.verificationMessage}>
+          <div className={styles.message}>
             <p>Η διεύθυνση e-mail σας έχει επιβεβαιωθεί.<br/>Μπορείτε τώρα να συνδεθείτε.</p>
+          </div>
+        )}        
+        {changedPasswordMessage && (
+          <div className={styles.message}>
+            <p>Ο κωδικός σας άλλαξε επιτυχώς.<br/>Μπορείτε τώρα να συνδεθείτε.</p>
           </div>
         )}
         <form onSubmit={handleSubmit} className={styles.form}>

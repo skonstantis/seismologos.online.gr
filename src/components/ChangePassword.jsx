@@ -79,7 +79,7 @@ const ChangePassword = () => {
       const result = await response.json();
       if (response.ok && password == verifyPassword) {
         setErrors([]);
-        navigate("/login");
+        navigate("/login?changedPassword=true");
       } else {
         let errorMessages = result.errors.map(
           (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
