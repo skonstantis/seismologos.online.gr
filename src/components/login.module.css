@@ -89,10 +89,12 @@
 }
 
 .message {
+  font-weight: bold;
   text-align: center;
   background-color: #e0ffe0;
   border: 1px solid #b2d8b2;
   border-radius: 10px;
   color: #4caf50;
   margin-bottom: 10px;
+  line-height: 25px;
 }

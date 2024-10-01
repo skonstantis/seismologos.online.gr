@@ -104,12 +104,12 @@ const Login = () => {
         <h1 className={styles.heading}>Σύνδεση Χρήστη</h1>
         {verifiedMessage && (
           <div className={styles.message}>
-            <p>Η διεύθυνση e-mail σας έχει επιβεβαιωθεί.<br/>Μπορείτε τώρα να συνδεθείτε.</p>
+            <p>Η διεύθυνση e-mail έχει επιβεβαιωθεί.<br/>Μπορείτε τώρα να συνδεθείτε.</p>
           </div>
         )}        
         {changedPasswordMessage && (
           <div className={styles.message}>
-            <p>Ο κωδικός σας άλλαξε επιτυχώς.<br/>Μπορείτε τώρα να συνδεθείτε.</p>
+            <p>Ο κωδικός πρόσβασης άλλαξε επιτυχώς.<br/>Μπορείτε τώρα να συνδεθείτε.</p>
           </div>
         )}
         <form onSubmit={handleSubmit} className={styles.form}>
