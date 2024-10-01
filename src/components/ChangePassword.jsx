@@ -5,6 +5,11 @@ import Errors from "./Errors";
 import Loading from "./Loading";
 
 const ChangePassword = () => {
+
+  useEffect(() => {
+    document.title = "Αλλαγή Κωδικού";
+  }, []);
+
   const [showForm, setShowForm] = useState(false);
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
@@ -14,10 +19,6 @@ const ChangePassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    document.title = "Αλλαγή Κωδικού";
-  }, []);
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -50,8 +51,8 @@ const ChangePassword = () => {
     verifyToken();
   }, [location]);
 
-  const handlePasswordChange = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
     if (password != verifyPassword) {
       setErrors(["Οι κωδικοί πρόσβασης δεν ταιριάζουν"]);
@@ -104,7 +105,7 @@ const ChangePassword = () => {
       <div className={styles.container}>
         <h1 className={styles.heading}>Αλλαγή Κωδικού Πρόσβασης</h1>
         {showForm && (
-          <form onSubmit={handlePasswordChange} className={styles.form}>
+          <form onSubmit={handleSubmit} className={styles.form}>
             <div>
               <input
                 type={showPasswords ? "text" : "password"}

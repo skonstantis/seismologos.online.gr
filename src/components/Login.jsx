@@ -138,6 +138,11 @@ const Login = () => {
           >
             {isLoading && errors.length !== 0 ? "Περιμένετε..." : "Σύνδεση"}
           </button>
+          <div className={styles.forgotPassword}>
+            <a href="/forgot-password" className={styles.link}>
+              <b>Ξέχασα τον Κωδικό Πρόσβασης μου</b>
+            </a>
+          </div>
           <p className={styles.registerPrompt}>
             Δεν έχετε λογαριασμό;{" "}
             <a href="/register" className={styles.link}>
