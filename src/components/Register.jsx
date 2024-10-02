@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import styles from "./register.module.css";
-import { validateInput } from "../js/register/validateInput";
 import Errors from "./Errors";
 import { useSession } from "../contexts/SessionContext"; 
 
@@ -43,23 +42,52 @@ const Register = () => {
 
   const [confirmationMessage, setConfirmationMessage] = useState(false);
 
+  const validateInput = async () => {
+    setIsTyping(false);
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch("https://seismologos.onrender.com/validate/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+  
+      const result = await response.json();
+      let errorMessages = [];
+  
+      if (!response.ok) {
+        errorMessages = result.errors.map(err => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα");
+      }
+  
+      if (password !== verifyPassword) {
+        errorMessages.push("Οι κωδικοί πρόσβασης δεν ταιριάζουν");
+      }
+  
+      if (!agree) {
+        errorMessages.push("Αποδεχθείτε τους Όρους Χρήσης και την Πολιτική Απορρήτου για να συνεχίσετε");
+      }
+  
+      if (!recaptchaToken) {
+        errorMessages.push("Συμπληρώστε το ReCAPTCHA για να συνεχίσετε");
+      }
+  
+      setErrors(errorMessages);
+    } catch (error) {
+      setErrors([`ERROR: ${error.message}`]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (isTyping && !pendingRequest) {
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(async () => {
         setPendingRequest(true);
-        await validateInput(
-          username,
-          email,
-          password,
-          verifyPassword,
-          recaptchaToken,
-          agree, 
-          setIsTyping,
-          setIsLoading,
-          setErrors
-        );
+        await validateInput();
         setPendingRequest(false);
       }, 100);
     }
