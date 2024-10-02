@@ -11,30 +11,38 @@ const Register = () => {
     document.title = "Εγγραφή Χρήστη";
   }, []);
 
-  const { sessionValid, loading } = useSession(); 
+  const { sessionValid, setNotification } = useSession();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (sessionValid) {
+      const notificationMessage = <div>Αυτό το σημείο σύνδεσης δεν είναι διαθέσιμο ενώ είστε συνδεδεμένοι<br/>Έγινε ανακατεύθηνση στην Αρχική</div>;
+      setNotification(notificationMessage, "red");
+      navigate("/"); 
+    }
+  }, [sessionValid, setNotification, navigate]);
+
+  if (sessionValid) return null; 
   
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
   const [showPasswords, setShowPasswords] = useState(false);
-  const [errors, setErrors] = useState([]);
-  const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
-  const [pendingRequest, setPendingRequest] = useState(false);
-  const [confirmationMessage, setConfirmationMessage] = useState(false);
   const [agree, setAgree] = useState(false);
 
+  const [errors, setErrors] = useState([]);
+  const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [pendingRequest, setPendingRequest] = useState(false);
+
+  const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    if (sessionValid) {
-      navigate("/"); 
-    }
-  }, [sessionValid, navigate]);
+  const [confirmationMessage, setConfirmationMessage] = useState(false);
+
 
   useEffect(() => {
     if (isTyping && !pendingRequest) {
@@ -106,6 +114,8 @@ const Register = () => {
         setRecaptchaToken(null);
         setErrors([]);
         setCurrentErrorIndex(0);
+        const notificationMessage = <div>Επιτυχής εγγραφή</div>;
+        setNotification(notificationMessage, "green");
       } else {
         let errorMessages = result.errors.map(
           (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
@@ -127,14 +137,6 @@ const Register = () => {
       setPendingRequest(false);
     }
   };  
-
-  if (loading) {
-    return null;
-  }
-
-  if (sessionValid) {
-    return null; 
-  }
 
   return (
     <div className={styles.wrap}>

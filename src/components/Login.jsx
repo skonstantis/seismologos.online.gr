@@ -10,35 +10,45 @@ const Login = () => {
     document.title = "Σύνδεση Χρήστη";
   }, []);
 
-  const navigate = useNavigate();
-  const location = useLocation();  
-  const { sessionValid, loading } = useSession();
+  const { sessionValid, setNotification } = useSession();
+  const navigate = useNavigate();  
+
+  useEffect(() => {
+    if (sessionValid) {
+      const notificationMessage = <div>Αυτό το σημείο σύνδεσης δεν είναι διαθέσιμο ενώ είστε συνδεδεμένοι<br/>Έγινε ανακατεύθηνση στην Αρχική</div>;
+      setNotification(notificationMessage, "red");
+      navigate("/"); 
+    }
+  }, [sessionValid, setNotification, navigate]);
+
+  if (sessionValid) return null; 
+  
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('verified') === 'true') 
+    {
+      const notificationMessage = (
+        <div>Η διεύθυνση e-mail έχει επιβεβαιωθεί.<br/>Μπορείτε τώρα να συνδεθείτε.</div>
+      );
+      setNotification(notificationMessage, "green");
+    }
+  }, [location.search]);
 
   const [key, setKey] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   const [errors, setErrors] = useState([]);
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
+
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const [verifiedMessage, setVerifiedMessage] = useState(false); 
-  const [changedPasswordMessage, setChangedPasswordMessage] = useState(false); 
 
-  useEffect(() => {
-    if (sessionValid) {
-      navigate("/");
-    }
-  }, [sessionValid, navigate]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    if (params.get('verified') === 'true') {
-      setVerifiedMessage(true);
-    }
-    if (params.get('changedPassword') === 'true') {
-      setChangedPasswordMessage(true);
-    }
-  }, [location.search]);
+  if (isAuthenticating) {
+    return <Loading />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,7 +79,8 @@ const Login = () => {
         localStorage.setItem("email", result.user.email);
         localStorage.setItem("id", result.user.id);
         localStorage.setItem("lastLogin", result.user.lastLogin);
-        window.location.reload();
+        const redirectUrl = "/?innerRedirect=true";
+        window.location.replace(redirectUrl); 
       } else {
         setIsAuthenticating(false);
         let errorMessages = result.errors.map(
@@ -86,32 +97,10 @@ const Login = () => {
     }
   };
 
-  if (loading) {
-    return null;
-  }
-
-  if (sessionValid) {
-    return null;
-  }
-
-  if (isAuthenticating) {
-    return <Loading />;
-  }
-
   return (
     <div className={styles.wrap}>
       <div className={styles.container}>
         <h1 className={styles.heading}>Σύνδεση Χρήστη</h1>
-        {verifiedMessage && (
-          <div className={styles.message}>
-            <p>Η διεύθυνση e-mail έχει επιβεβαιωθεί.<br/>Μπορείτε τώρα να συνδεθείτε.</p>
-          </div>
-        )}        
-        {changedPasswordMessage && (
-          <div className={styles.message}>
-            <p>Ο κωδικός πρόσβασης άλλαξε επιτυχώς.<br/>Μπορείτε τώρα να συνδεθείτε.</p>
-          </div>
-        )}
         <form onSubmit={handleSubmit} className={styles.form}>
           <div>
             <input

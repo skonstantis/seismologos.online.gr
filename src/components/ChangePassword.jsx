@@ -12,27 +12,38 @@ const ChangePassword = () => {
     document.title = "Αλλαγή Κωδικού";
   }, []);
   
-  const { sessionValid, loading } = useSession();
+  const { sessionValid, setNotification } = useSession();
 
   useEffect(() => {
     const checkAndLogout = async () => {
       if (sessionValid) {
         await forceLogout();
-        window.location.reload();
+        sessionStorage.setItem("notification", "Πραγματοποιήθηκε αναγκαστική αποσύνδεση");
+        sessionStorage.setItem("notificationColor", "red");
+        window.location.reload("/?innerRedirect=true");
       }
     };
     checkAndLogout();
   }, [sessionValid, forceLogout]);
 
   const [showForm, setShowForm] = useState(false);
+
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
+
   const [showPasswords, setShowPasswords] = useState(false);
   const [errors, setErrors] = useState([]);
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
+
   const [isLoading, setIsLoading] = useState(false);
-  const location = useLocation();
+  
   const navigate = useNavigate();
+
+  const location = useLocation();
+  
+  if (isLoading) {
+    return <Loading />;
+  }
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -93,7 +104,11 @@ const ChangePassword = () => {
       const result = await response.json();
       if (response.ok && password == verifyPassword) {
         setErrors([]);
-        navigate("/login?changedPassword=true");
+        const notificationMessage = (
+          <div>Ο κωδικός πρόσβασης άλλαξε επιτυχώς<br/>Μπορείτε τώρα να συνδεθείτε</div>
+        );
+        setNotification(notificationMessage, "green");
+        navigate("/login");
       } else {
         let errorMessages = result.errors.map(
           (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
@@ -109,10 +124,6 @@ const ChangePassword = () => {
       setIsLoading(false);
     }
   };
-
-  if (isLoading) {
-    return <Loading />;
-  }
 
   return (
     <div className={styles.wrap}>

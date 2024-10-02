@@ -1,20 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styles from "./forgotPassword.module.css";
 import Errors from "./Errors";
 import Loading from "./Loading";
+import { useSession } from "../contexts/SessionContext";
 
 const ForgotPassword = () => {
   useEffect(() => {
     document.title = "Ξέχασα τον Κωδικό Πρόσβασης μου";
   }, []);
 
+  const { sessionValid, setNotification } = useSession();
+  const navigate = useNavigate();  
+
+  useEffect(() => {
+    if (sessionValid) {
+      const notificationMessage = <div>Αυτό το σημείο σύνδεσης δεν είναι διαθέσιμο ενώ είστε συνδεδεμένοι<br/>Έγινε ανακατεύθηνση στην Αρχική</div>;
+      setNotification(notificationMessage, "red");
+      navigate("/"); 
+    }
+  }, [sessionValid, setNotification, navigate]);
+
+  if (sessionValid) return null; 
+
   const [confirmationMessage, setConfirmationMessage] = useState(false);
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState([]);
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,6 +54,8 @@ const ForgotPassword = () => {
       if (response.ok) {
         setErrors([]);
         setConfirmationMessage(true);
+        const notificationMessage = <div>Το e-mail στάλθηκε επιτυχώς</div>;
+        setNotification(notificationMessage, "green");
       } else {
         let errorMessages = result.errors.map(
           (err) => err.msg || "ΣΦΑΛΜΑ: Άγνωστο Σφάλμα"
@@ -49,10 +68,6 @@ const ForgotPassword = () => {
       setIsLoading(false);
     }
   };
-
-  if (isLoading) {
-    return <Loading />;
-  }
 
   return (
     <div className={styles.wrap}>

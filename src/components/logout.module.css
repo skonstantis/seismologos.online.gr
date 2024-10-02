@@ -1,0 +1,27 @@
+.wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw; 
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+  
+  .container {
+    position: relative;
+    background-color: #fff;
+    padding-left: 20px; 
+    padding-right: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 300px;
+    text-shadow: none;
+  }
+  
+  .heading {
+    text-align: center;
+    text-shadow: 2px 4px 3px rgba(0,0,0,0.2);
+  }

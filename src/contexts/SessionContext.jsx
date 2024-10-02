@@ -1,11 +1,6 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { validateSession } from "../js/login/validateSession";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import Notification from "../components/Notification"; 
+import { formatTimestamp } from "../js/helpers/formatTimestamp"; 
 
 const SessionContext = createContext();
 
@@ -14,31 +9,61 @@ export const useSession = () => {
 };
 
 export const SessionProvider = ({ children }) => {
+  const notificationTimeout = 3 * 1000; // 3 seconds
+  const [notificationQueue, setNotificationQueue] = useState([]);
+  const [currentNotification, setCurrentNotification] = useState("");
+  const [currentColor, setCurrentColor] = useState("green"); 
   const [sessionValid, setSessionValid] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [notification, setNotification] = useState("");
-  const timeout = 30 * 60 * 1000;
-  const timeoutIdRef = useRef(null);
-  const startTimeoutRef = useRef(null);
-  const pausedTimeoutRef = useRef(null);
-  const remainingTimeoutRef = useRef(null);
 
-  const formatTimestamp = (timestamp) => {
-    const date = new Date(Number(timestamp));
+  const checkSessionTimeout = 30 * 60 * 1000; // 30 minutes
+  const checkSessionTimeoutIdRef = useRef(null);
 
-    if (isNaN(date.getTime())) {
-      return null;
+  useEffect(() => {
+    if (notificationQueue.length > 0) {
+      const { message, color } = notificationQueue[0]; 
+      setCurrentNotification(message);
+      setCurrentColor(color); 
+
+      const timeoutId = setTimeout(() => {
+        setCurrentNotification(""); 
+        setNotificationQueue((prevQueue) => prevQueue.slice(1)); 
+      }, notificationTimeout);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
     }
+  }, [notificationQueue]);
 
-    return date.toLocaleString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    });
+  const validateSession = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (token == null) return false;
+
+      const response = await fetch(
+        "https://seismologos.onrender.com/validate/session",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token }),
+        }
+      );
+
+      const result = await response.json();
+      if (!response.ok) return false;
+
+      localStorage.setItem("authToken", result.token);
+      localStorage.setItem("username", result.user.username);
+      localStorage.setItem("email", result.user.email);
+      localStorage.setItem("id", result.user.id);
+      localStorage.setItem("lastLogin", result.user.lastLogin);
+      return true;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const checkSession = async (isUpdate = false) => {
@@ -52,52 +77,40 @@ export const SessionProvider = ({ children }) => {
       const formattedLastLogin = formatTimestamp(lastLogin);
 
       if (!isUpdate) {
-        if (formattedLastLogin) {
-          setNotification(
-            <div>
-              Σύνδεση ως: {username}
-              <br />
-              Τελευταία σύνδεση: {formattedLastLogin}
-            </div>
-          );
-        } else {
-          setNotification(<div>Σύνδεση ως: {username}</div>);
-        }
+        const notificationMessage = formattedLastLogin
+          ? <div>Σύνδεση ως: {username}<br />Τελευταία σύνδεση: {formattedLastLogin}</div>
+          : <div>Σύνδεση ως: {username}</div>;
+
+        setTimeout(() => {
+          setNotificationQueue((prevQueue) => [...prevQueue, { message: notificationMessage, color: "green" }]);
+        }, 100);
       }
     }
 
     setLoading(false);
 
-    if (timeoutIdRef.current) {
-      clearTimeout(timeoutIdRef.current);
+    if (checkSessionTimeoutIdRef.current) {
+      clearTimeout(checkSessionTimeoutIdRef.current);
     }
 
-    setTimeout(() => setNotification(""), 3000);
-    startTimeoutRef.current = Date.now();
-    timeoutIdRef.current = setTimeout(() => checkSession(true), timeout);
+    checkSessionTimeoutIdRef.current = setTimeout(() => checkSession(true), checkSessionTimeout);
   };
 
   useEffect(() => {
-    checkSession();
+    const storedNotification = sessionStorage.getItem("notification");
+    const storedNotificationColor = sessionStorage.getItem("notificationColor");
+    if (storedNotification && storedNotificationColor) {
+      const notificationMessage = storedNotification; 
+      setNotificationQueue((prevQueue) => [{ message: notificationMessage, color: storedNotificationColor}, ...prevQueue]);
+      sessionStorage.removeItem("notification"); 
+      sessionStorage.removeItem("notificationColor"); 
+    }
+
+    checkSession(); 
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        if (remainingTimeoutRef.current || pausedTimeoutRef.current != null) {
-          const timeAway = Date.now() - pausedTimeoutRef.current;
-          if (timeAway >= remainingTimeoutRef.current) checkSession();
-          else
-            timeoutIdRef.current = setTimeout(
-              () => checkSession(true),
-              remainingTimeoutRef.current - timeAway
-            );
-        }
-      } else if (document.visibilityState === "hidden") {
-        if (timeoutIdRef.current && startTimeoutRef.current != null) {
-          const now = Date.now();
-          clearTimeout(timeoutIdRef.current);
-          pausedTimeoutRef.current = now;
-          remainingTimeoutRef.current = startTimeoutRef.current + timeout - now;
-        }
+        checkSession();
       }
     };
 
@@ -105,41 +118,18 @@ export const SessionProvider = ({ children }) => {
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      if (timeoutIdRef.current) {
-        clearTimeout(timeoutIdRef.current);
+      if (checkSessionTimeoutIdRef.current) {
+        clearTimeout(checkSessionTimeoutIdRef.current);
       }
     };
   }, []);
 
   return (
-    <SessionContext.Provider value={{ sessionValid, loading }}>
+    <SessionContext.Provider value={{ sessionValid, loading, setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }]) }}>
       {children}
-      {notification && <Notification message={notification} />}
+      {currentNotification && <Notification message={currentNotification} color={currentColor} />}
     </SessionContext.Provider>
   );
-};
-
-const Notification = ({ message }) => {
-  return <div style={notificationStyle}>{message}</div>;
-};
-
-const notificationStyle = {
-  position: "fixed",
-  bottom: "25px",
-  left: "50%",
-  transform: "translateX(-50%)",
-  backgroundColor: "green",
-  color: "white",
-  padding: "3px",
-  borderRadius: "5px",
-  fontSize: "14px",
-  zIndex: 1000,
-  transition: "opacity 0.5s ease-in-out",
-  opacity: 0.9,
-  boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
-  textAlign: "center",
-  lineHeight: "1.5",
-  fontWeight: "bold",
 };
 
 export default SessionProvider;

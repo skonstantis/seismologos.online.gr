@@ -11,31 +11,16 @@ import Faq from './components/Faq';
 import TermsOfService from './components/TermsOfService';
 import NotFound from './components/NotFound';
 import { SessionProvider, useSession } from './contexts/SessionContext'; 
-import "./App.css";
 import Loading from './components/Loading';
 import ChangePassword from './components/ChangePassword';
 import ForgotPassword from './components/ForgotPassword';
 import Logout from './components/Logout';
+import "./App.css";
 
-const App = () => {
-  return (
-    <SessionProvider>
-      <Router>
-        <Header />
-        <MainRoutes />
-        <Footer />
-      </Router>
-    </SessionProvider>
-  );
-};
-
-const MainRoutes = () => {
-  const { sessionValid, loading } = useSession();
-
-  if (loading ) {
-    return <Loading />;
-  }
-
+const Main = () => {
+  const { loading } = useSession();
+  if (loading) return <Loading />;
+  
   return (
     <Routes>
       <Route path="/" element={<Home />} />
@@ -50,6 +35,18 @@ const MainRoutes = () => {
       <Route path="/logout" element={<Logout />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
+  );
+};
+
+const App = () => {
+  return (
+    <SessionProvider>
+      <Router>
+        <Header />
+        <Main />
+        <Footer />
+      </Router>
+    </SessionProvider>
   );
 };
 
