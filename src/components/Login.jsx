@@ -30,7 +30,7 @@ const Login = () => {
     if (params.get('verified') === 'true') 
     {
       const notificationMessage = (
-        <div>Η διεύθυνση e-mail έχει επιβεβαιωθεί.<br/>Μπορείτε τώρα να συνδεθείτε.</div>
+        <div>Η διεύθυνση e-mail έχει επιβεβαιωθεί<br/>Μπορείτε τώρα να συνδεθείτε</div>
       );
       setNotification(notificationMessage, "green");
     }
@@ -45,10 +45,6 @@ const Login = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-
-  if (isAuthenticating) {
-    return <Loading />;
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -97,6 +93,10 @@ const Login = () => {
     }
   };
 
+  if (isAuthenticating) {
+    return <Loading />;
+  }
+  
   return (
     <div className={styles.wrap}>
       <div className={styles.container}>

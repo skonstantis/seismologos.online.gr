@@ -41,9 +41,6 @@ const ChangePassword = () => {
 
   const location = useLocation();
   
-  if (isLoading) {
-    return <Loading />;
-  }
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -125,6 +122,10 @@ const ChangePassword = () => {
     }
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
+  
   return (
     <div className={styles.wrap}>
       <div className={styles.container}>

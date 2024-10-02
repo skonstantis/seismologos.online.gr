@@ -29,10 +29,6 @@ const ForgotPassword = () => {
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -69,6 +65,10 @@ const ForgotPassword = () => {
     }
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
+  
   return (
     <div className={styles.wrap}>
       <div className={styles.container}>
