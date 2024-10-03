@@ -10,14 +10,19 @@ export const useSession = () => {
 
 export const SessionProvider = ({ children }) => {
   const notificationTimeout = 3 * 1000; // 3 seconds
+
   const [notificationQueue, setNotificationQueue] = useState([]);
   const [currentNotification, setCurrentNotification] = useState("");
   const [currentColor, setCurrentColor] = useState("green"); 
+
   const [sessionValid, setSessionValid] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const checkSessionTimeout = 30 * 60 * 1000; // 30 minutes
   const checkSessionTimeoutIdRef = useRef(null);
+  const startTimeoutRef = useRef(null);
+  const pausedTimeoutRef = useRef(null);
+  const remainingTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (notificationQueue.length > 0) {
@@ -89,6 +94,8 @@ export const SessionProvider = ({ children }) => {
 
     setLoading(false);
 
+    startTimeoutRef.current = Date.now();
+    
     if (checkSessionTimeoutIdRef.current) {
       clearTimeout(checkSessionTimeoutIdRef.current);
     }
@@ -106,14 +113,27 @@ export const SessionProvider = ({ children }) => {
       sessionStorage.removeItem("notificationColor"); 
     }
 
-    checkSession(); 
-
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        checkSession();
+        if (remainingTimeoutRef.current || pausedTimeoutRef.current != null) {
+          const timeAway = Date.now() - pausedTimeoutRef.current;
+          if (timeAway >= remainingTimeoutRef.current) checkSession();
+          else
+            checkSessionTimeoutIdRef.current = setTimeout(
+              () => checkSession(true),
+              remainingTimeoutRef.current - timeAway
+            );
+        }
+      } else if (document.visibilityState === "hidden") {
+        if (checkSessionTimeoutIdRef.current && startTimeoutRef.current != null) {
+          const now = Date.now();
+          clearTimeout(checkSessionTimeoutIdRef.current);
+          pausedTimeoutRef.current = now;
+          remainingTimeoutRef.current = startTimeoutRef.current + checkSessionTimeout - now;
+        }
       }
     };
-
+    checkSession(); 
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {

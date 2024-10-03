@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useSession } from "../contexts/SessionContext"; 
+import { useSession } from "../contexts/SessionContext";
 import styles from "./header.module.css";
 
 const LogoAndBrand = () => (
@@ -17,27 +17,25 @@ const LogoAndBrand = () => (
 
 const AuthLinks = () => (
   <>
-    <li>
-      <Link to="/login">
-        <p>Σύνδεση</p>
+    <li className={styles.navItem}>
+      <Link to="/login" className={styles.link}>
+        <p className={styles.linkText}>Σύνδεση</p>
       </Link>
     </li>
-    <li>
-      <Link to="/register">
-        <p>Εγγραφή</p>
+    <li className={styles.navItem}>
+      <Link to="/register" className={styles.link}>
+        <p className={styles.linkText}>Εγγραφή</p>
       </Link>
     </li>
   </>
 );
 
 const LoggedInLinks = () => (
-  <>
-    <li>
-      <Link to="/logout">
-        <p>Αποσύνδεση</p>
-      </Link>
-    </li>
-  </>
+  <li className={styles.navItem}>
+    <Link to="/logout" className={styles.link}>
+      <img className={styles.logoutIcon} src="../assets/loginout.svg" alt="Αποσύνδεση" />
+    </Link>
+  </li>
 );
 
 const HomeLink = () => (
@@ -64,14 +62,14 @@ const Header = () => {
   const isAuthPage = location.pathname !== "/";
 
   if (loading) {
-    return null; 
+    return null;
   }
 
   return (
     <nav className={styles.header}>
       <LogoAndBrand />
       <div className={styles.navRight}>
-        <ul>
+        <ul className={styles.navList}>
           {isAuthPage && <HomeLink />}
           {!loading && !sessionValid && <AuthLinks />}
           {!loading && sessionValid && <LoggedInLinks />}
