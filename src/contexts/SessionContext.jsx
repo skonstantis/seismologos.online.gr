@@ -10,6 +10,7 @@ export const useSession = () => {
 
 export const SessionProvider = ({ children }) => {
   const notificationTimeout = 3 * 1000; // 3 seconds
+  const HEARTBEAT_INTERVAL = 30000; // 30 seconds
 
   const [notificationQueue, setNotificationQueue] = useState([]);
   const [currentNotification, setCurrentNotification] = useState("");
@@ -17,12 +18,34 @@ export const SessionProvider = ({ children }) => {
 
   const [sessionValid, setSessionValid] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState(null); 
 
   const checkSessionTimeout = 30 * 60 * 1000; // 30 minutes
   const checkSessionTimeoutIdRef = useRef(null);
   const startTimeoutRef = useRef(null);
   const pausedTimeoutRef = useRef(null);
   const remainingTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    let heartbeat; 
+
+    if (socket) {
+      heartbeat = setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({ type: 'heartbeat' }));
+        }
+      }, HEARTBEAT_INTERVAL);
+      
+      socket.onclose = () => {
+        clearInterval(heartbeat);
+        console.log('WebSocket connection closed');
+      };
+    }
+
+    return () => {
+      clearInterval(heartbeat); 
+    };
+  }, [socket]);
 
   useEffect(() => {
     if (notificationQueue.length > 0) {
@@ -90,10 +113,25 @@ export const SessionProvider = ({ children }) => {
           setNotificationQueue((prevQueue) => [...prevQueue, { message: notificationMessage, color: "green" }]);
         }, 100);
       }
+
+      const newSocket = new WebSocket(`ws://seismologos.onrender.com/ws/${username}`); 
+
+      newSocket.onopen = () => {
+        console.log('WebSocket connection established');
+        setSocket(newSocket);
+      };
+
+      newSocket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+    } else {
+      if (socket) {
+        socket.close(); 
+      }
     }
 
     setLoading(false);
-
     startTimeoutRef.current = Date.now();
     
     if (checkSessionTimeoutIdRef.current) {
@@ -142,6 +180,7 @@ export const SessionProvider = ({ children }) => {
         }
       }
     };
+
     checkSession(); 
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
@@ -150,8 +189,11 @@ export const SessionProvider = ({ children }) => {
       if (checkSessionTimeoutIdRef.current) {
         clearTimeout(checkSessionTimeoutIdRef.current);
       }
+      if (socket) {
+        socket.close();
+      }
     };
-  }, []);
+  }, []); 
 
   return (
     <SessionContext.Provider value={{ sessionValid, loading, setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }]) }}>
