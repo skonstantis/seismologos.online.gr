@@ -33,7 +33,7 @@ const AuthLinks = () => (
 const LoggedInLinks = () => (
   <li className={styles.navItem}>
     <Link to="/logout" className={styles.link}>
-      <img className={styles.logoutIcon} src="../assets/loginout.svg" alt="Αποσύνδεση" />
+      <img className={styles.logoutIcon} src="../assets/logout.svg" alt="Αποσύνδεση" />
     </Link>
   </li>
 );
