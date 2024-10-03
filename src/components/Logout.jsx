@@ -59,8 +59,8 @@ const Logout = () => {
           localStorage.removeItem("lastLogin");
           localStorage.removeItem("id");
 
-          sessionStorage.setItem("notification", "Επιτυχής Αποσύνδεση");
-          sessionStorage.setItem("notificationColor", "green");
+          sessionStorage.setItem("notifications", ["Επιτυχής Αποσύνδεση"]);
+          sessionStorage.setItem("notificationsColors", ["green"]);
 
           const redirectUrl = innerRedirect ? "/?innerRedirect=true" : "/";
           window.location.replace(redirectUrl); 

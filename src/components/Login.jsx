@@ -4,6 +4,7 @@ import { useSession } from "../contexts/SessionContext";
 import styles from "./login.module.css";
 import Errors from "./Errors";
 import Loading from "./Loading";
+import { forceLogout } from "../js/logout/forceLogout";
 
 const Login = () => {
   useEffect(() => {
@@ -13,28 +14,42 @@ const Login = () => {
   const { sessionValid, setNotification } = useSession();
   const navigate = useNavigate();  
 
-  useEffect(() => {
-    if (sessionValid) {
-      const notificationMessage = <div>Αυτό το σημείο σύνδεσης δεν είναι διαθέσιμο ενώ είστε συνδεδεμένοι<br/>Έγινε ανακατεύθηνση στην Αρχική</div>;
-      setNotification(notificationMessage, "red");
-      navigate("/"); 
-    }
-  }, [sessionValid, setNotification, navigate]);
-
   if (sessionValid) return null; 
   
   const location = useLocation();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    if (params.get('verified') === 'true') 
-    {
-      const notificationMessage = (
-        <div>Η διεύθυνση e-mail έχει επιβεβαιωθεί<br/>Μπορείτε τώρα να συνδεθείτε</div>
-      );
-      setNotification(notificationMessage, "green");
+    const verified = params.get('verified') === 'true';
+    const checkLogout = async () => {
+      if (sessionValid) {
+        if(verified)
+        {
+          await forceLogout();
+          sessionStorage.setItem("notifications", ["Πραγματοποιήθηκε αναγκαστική αποσύνδεση", "Η διεύθυνση e-mail έχει επιβεβαιωθεί<br/>Μπορείτε τώρα να συνδεθείτε"]);
+          sessionStorage.setItem("notificationsColors", ["red", "green"]);
+          window.location.reload("/?innerRedirect=true");
+        }
+        else
+        {
+          const notificationMessage = <div>Αυτό το σημείο σύνδεσης δεν είναι διαθέσιμο ενώ είστε συνδεδεμένοι<br/>Έγινε ανακατεύθηνση στην Αρχική</div>;
+          setNotification(notificationMessage, "red");
+          navigate("/"); 
+        }
+      }
+      else
+      {
+        if(verified)
+        {
+          const notificationMessage = (
+            <div>Η διεύθυνση e-mail έχει επιβεβαιωθεί<br/>Μπορείτε τώρα να συνδεθείτε</div>
+          );
+          setNotification(notificationMessage, "green");
+        }
+      }
     }
-  }, [location.search]);
+    checkLogout();
+  }, [location.search, sessionValid, setNotification, navigate, forceLogout]);
 
   const [key, setKey] = useState("");
   const [password, setPassword] = useState("");

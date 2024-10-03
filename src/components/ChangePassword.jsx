@@ -18,8 +18,8 @@ const ChangePassword = () => {
     const checkAndLogout = async () => {
       if (sessionValid) {
         await forceLogout();
-        sessionStorage.setItem("notification", "Πραγματοποιήθηκε αναγκαστική αποσύνδεση");
-        sessionStorage.setItem("notificationColor", "red");
+        sessionStorage.setItem("notifications", ["Πραγματοποιήθηκε αναγκαστική αποσύνδεση"]);
+        sessionStorage.setItem("notificationsColors", ["red"]);
         window.location.reload("/?innerRedirect=true");
       }
     };

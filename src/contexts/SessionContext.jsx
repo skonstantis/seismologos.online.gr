@@ -104,13 +104,22 @@ export const SessionProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const storedNotification = sessionStorage.getItem("notification");
-    const storedNotificationColor = sessionStorage.getItem("notificationColor");
-    if (storedNotification && storedNotificationColor) {
-      const notificationMessage = storedNotification; 
-      setNotificationQueue((prevQueue) => [{ message: notificationMessage, color: storedNotificationColor}, ...prevQueue]);
-      sessionStorage.removeItem("notification"); 
-      sessionStorage.removeItem("notificationColor"); 
+    const storedNotifications = sessionStorage.getItem("notifications");
+    const storedNotificationsColors = sessionStorage.getItem("notificationsColors");
+
+    if (storedNotifications && storedNotificationsColors) {
+      const notifications = JSON.parse(storedNotifications);
+      const notificationsColors = JSON.parse(storedNotificationsColors);
+
+      const notificationsQueue = notifications.map((message, index) => ({
+        message,
+        color: notificationsColors[index],
+      }));
+
+      setNotificationQueue((prevQueue) => [...notificationsQueue, ...prevQueue]);
+
+      sessionStorage.removeItem("notifications"); 
+      sessionStorage.removeItem("notificationsColors"); 
     }
 
     const handleVisibilityChange = () => {
