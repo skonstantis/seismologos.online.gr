@@ -13,21 +13,20 @@ const Login = () => {
 
   const { sessionValid, setNotification } = useSession();
   const navigate = useNavigate();  
-
-  if (sessionValid) return null; 
   
   const location = useLocation();
+  const params = new URLSearchParams(location.search);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const verified = params.get('verified') === 'true';
+    const verified = params.get('verified') === 'true'; 
+    console.log(verified);
     const checkLogout = async () => {
       if (sessionValid) {
         if(verified)
         {
+          sessionStorage.setItem("notifications", "[\"Πραγματοποιήθηκε αναγκαστική αποσύνδεση\"]");
+          sessionStorage.setItem("notificationsColors", "[\"red\"]");
           await forceLogout();
-          sessionStorage.setItem("notifications", ["Πραγματοποιήθηκε αναγκαστική αποσύνδεση", "Η διεύθυνση e-mail έχει επιβεβαιωθεί<br/>Μπορείτε τώρα να συνδεθείτε"]);
-          sessionStorage.setItem("notificationsColors", ["red", "green"]);
           window.location.reload("/?innerRedirect=true");
         }
         else
@@ -49,7 +48,7 @@ const Login = () => {
       }
     }
     checkLogout();
-  }, [location.search, sessionValid, setNotification, navigate, forceLogout]);
+  }, [location.search]);
 
   const [key, setKey] = useState("");
   const [password, setPassword] = useState("");
@@ -107,6 +106,8 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  if (sessionValid) return null; 
 
   if (isAuthenticating) {
     return <Loading />;
