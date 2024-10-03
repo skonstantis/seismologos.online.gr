@@ -46,16 +46,6 @@ const HomeLink = () => (
   </li>
 );
 
-const SocialLink = () => (
-  <a
-    href="https://x.com/seismologos"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <img className={styles.x} src="../assets/x.svg" alt="X" />
-  </a>
-);
-
 const Header = () => {
   const location = useLocation();
   const { sessionValid, loading } = useSession();
@@ -74,7 +64,6 @@ const Header = () => {
           {!loading && !sessionValid && <AuthLinks />}
           {!loading && sessionValid && <LoggedInLinks />}
         </ul>
-        <SocialLink />
       </div>
     </nav>
   );
