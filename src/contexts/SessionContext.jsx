@@ -88,7 +88,7 @@ export const SessionProvider = ({ children }) => {
       localStorage.setItem("email", result.user.email);
       localStorage.setItem("id", result.user.id);
       localStorage.setItem("lastLogin", result.user.lastLogin);
-      return true;
+      return {authToken: token, username: result.user.username, email: result.user.email, id: result.user.id, lastLogin: result.user.lastLogin };
     } catch (error) {
       console.error(error);
     }
@@ -96,12 +96,15 @@ export const SessionProvider = ({ children }) => {
 
   const checkSession = async (isUpdate = false) => {
     setLoading(true);
-    const isValidSession = await validateSession();
-    setSessionValid(isValidSession);
+    const user = await validateSession();
+    if(user == false)
+      setSessionValid(false);
+    else
+      setSessionValid(true)
 
-    if (isValidSession) {
-      const username = localStorage.getItem("username");
-      const lastLogin = localStorage.getItem("lastLogin");
+    if (user != false) {
+      const username = user.username;
+      const lastLogin = user.lastLogin;
       const formattedLastLogin = formatTimestamp(lastLogin);
 
       if (!isUpdate) {
