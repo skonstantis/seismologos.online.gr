@@ -10,7 +10,7 @@ export const useSession = () => {
 
 export const SessionProvider = ({ children }) => {
   const notificationTimeout = 3 * 1000; // 3 seconds
-  const HEARTBEAT_INTERVAL = 30000; // 30 seconds
+  const HEARTBEAT_INTERVAL = 60000; // 60 seconds
 
   const [notificationQueue, setNotificationQueue] = useState([]);
   const [currentNotification, setCurrentNotification] = useState("");
@@ -114,7 +114,7 @@ export const SessionProvider = ({ children }) => {
         }, 100);
       }
 
-      const newSocket = new WebSocket(`ws://seismologos.onrender.com/ws/${username}`); 
+      const newSocket = new WebSocket(`wss://seismologos.onrender.com/ws/${username}`); 
 
       newSocket.onopen = () => {
         console.log('WebSocket connection established');
