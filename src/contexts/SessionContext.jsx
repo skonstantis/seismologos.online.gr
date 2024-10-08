@@ -18,9 +18,6 @@ export const SessionProvider = ({ children }) => {
   const [sessionValid, setSessionValid] = useState(false);
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null); 
-  const [isUser, setIsUser] = useState(false);
-  const [username, setUsername] = useState(null);
-  const [authToken, setAuthToken] = useState(null);
 
   const checkSessionTimeout = 30 * 60 * 1000; // 30 minutes
   const checkSessionTimeoutIdRef = useRef(null);
@@ -88,12 +85,10 @@ export const SessionProvider = ({ children }) => {
       socket.close(); 
     }
 
-    setIsUser(user);
-
     if (user != false) {
-      setUsername(user.username);
-      setAuthToken(user.authToken);
+      const username = user.username;
       const lastLogin = user.lastLogin;
+      const authToken = user.authToken;
       const formattedLastLogin = formatTimestamp(lastLogin);
 
       if (!isUpdate) {
@@ -173,38 +168,12 @@ export const SessionProvider = ({ children }) => {
           const timeAway = Date.now() - pausedTimeoutRef.current;
           if (timeAway >= remainingTimeoutRef.current) checkSession();
           else
-          {
             checkSessionTimeoutIdRef.current = setTimeout(
               () => checkSession(true),
               remainingTimeoutRef.current - timeAway
             );
-
-
-            const newSocket = null;
-            
-            if(isUser)
-              newSocket = new WebSocket(`wss://seismologos.onrender.com/ws/activeUsers/${username}?token=${authToken}`); 
-            else
-              newSocket = new WebSocket(`wss://seismologos.onrender.com/ws/activeVisitors/`); 
-
-            newSocket.onopen = () => {
-              setSocket(newSocket);
-            };
-
-            newSocket.onmessage = (event) => {
-              const message = event.data; 
-              console.log('Message received:', message); 
-            };
-
-            newSocket.onerror = (error) => {
-              console.error('WebSocket error:', error);
-            };
-          }
         }
       } else if (document.visibilityState === "hidden") {
-        if (socket) {
-          socket.close(); 
-        }
         if (checkSessionTimeoutIdRef.current && startTimeoutRef.current != null) {
           const now = Date.now();
           clearTimeout(checkSessionTimeoutIdRef.current);
