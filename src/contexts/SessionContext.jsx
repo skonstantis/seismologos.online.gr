@@ -105,6 +105,7 @@ export const SessionProvider = ({ children }) => {
     if (user != false) {
       const username = user.username;
       const lastLogin = user.lastLogin;
+      const authToken = user.authToken;
       const formattedLastLogin = formatTimestamp(lastLogin);
 
       if (!isUpdate) {
@@ -117,7 +118,7 @@ export const SessionProvider = ({ children }) => {
         }, 100);
       }
 
-      const newSocket = new WebSocket(`wss://seismologos.onrender.com/ws/${username}`); 
+      const newSocket = new WebSocket(`wss://seismologos.onrender.com/ws/activeUsers/${username}?token=${authToken}`); 
 
       newSocket.onopen = () => {
         console.log('WebSocket connection established');
