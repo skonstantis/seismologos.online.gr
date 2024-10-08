@@ -10,7 +10,6 @@ export const useSession = () => {
 
 export const SessionProvider = ({ children }) => {
   const notificationTimeout = 3 * 1000; // 3 seconds
-  const HEARTBEAT_INTERVAL = 60000; // 60 seconds
 
   const [notificationQueue, setNotificationQueue] = useState([]);
   const [currentNotification, setCurrentNotification] = useState("");
@@ -26,26 +25,6 @@ export const SessionProvider = ({ children }) => {
   const pausedTimeoutRef = useRef(null);
   const remainingTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    let heartbeat; 
-
-    if (socket) {
-      heartbeat = setInterval(() => {
-        if (socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify({ type: 'heartbeat' }));
-        }
-      }, HEARTBEAT_INTERVAL);
-      
-      socket.onclose = () => {
-        clearInterval(heartbeat);
-        console.log('WebSocket connection closed');
-      };
-    }
-
-    return () => {
-      clearInterval(heartbeat); 
-    };
-  }, [socket]);
 
   useEffect(() => {
     if (notificationQueue.length > 0) {
@@ -102,6 +81,10 @@ export const SessionProvider = ({ children }) => {
     else
       setSessionValid(true)
 
+    if (socket) {
+      socket.close(); 
+    }
+
     if (user != false) {
       const username = user.username;
       const lastLogin = user.lastLogin;
@@ -121,8 +104,12 @@ export const SessionProvider = ({ children }) => {
       const newSocket = new WebSocket(`wss://seismologos.onrender.com/ws/activeUsers/${username}?token=${authToken}`); 
 
       newSocket.onopen = () => {
-        console.log('WebSocket connection established');
         setSocket(newSocket);
+      };
+
+      newSocket.onmessage = (event) => {
+        const message = event.data; 
+        console.log('Message received:', message); 
       };
 
       newSocket.onerror = (error) => {
@@ -130,9 +117,20 @@ export const SessionProvider = ({ children }) => {
       };
 
     } else {
-      if (socket) {
-        socket.close(); 
-      }
+      const newSocket = new WebSocket(`wss://seismologos.onrender.com/ws/activeVisitors/`); 
+
+      newSocket.onopen = () => {
+        setSocket(newSocket);
+      };
+
+      newSocket.onmessage = (event) => {
+        const message = event.data; 
+        console.log('Message received:', message); 
+      };
+
+      newSocket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
     }
 
     setLoading(false);
