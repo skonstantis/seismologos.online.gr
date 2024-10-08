@@ -86,7 +86,6 @@ export const SessionProvider = ({ children }) => {
 
     if (socket) {
       socket.close(); 
-      setSocket(null);
     }
 
     setIsUser(user);
@@ -205,7 +204,6 @@ export const SessionProvider = ({ children }) => {
       } else if (document.visibilityState === "hidden") {
         if (socket) {
           socket.close(); 
-          setSocket(null);
         }
         if (checkSessionTimeoutIdRef.current && startTimeoutRef.current != null) {
           const now = Date.now();
@@ -226,7 +224,6 @@ export const SessionProvider = ({ children }) => {
       }
       if (socket) {
         socket.close();
-        setSocket(null);
       }
     };
   }, []); 
