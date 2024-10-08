@@ -150,7 +150,7 @@ const Login = () => {
               className={styles.checkbox}
             />
             <label className={styles.showPasswords} htmlFor="showPasswords">
-              Εμφάνιση Κωδικών
+              Εμφάνιση Κωδικού
             </label>
           </div>
           <div>
