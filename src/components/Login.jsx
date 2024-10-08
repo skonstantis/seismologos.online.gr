@@ -19,7 +19,6 @@ const Login = () => {
 
   useEffect(() => {
     const verified = params.get('verified') === 'true'; 
-    console.log(verified);
     const checkLogout = async () => {
       if (sessionValid) {
         if(verified)
