@@ -82,6 +82,10 @@ li a:hover {
   margin-top: 16px;
 }
 
+.activeIcons {
+  width: 22px;
+}
+
 .logoutIcon {
   height: 17px;
   padding: 5px;
@@ -100,6 +104,12 @@ li a:hover {
   margin: 5px;
   color: rgb(18, 31, 65);
   font-weight: bold;
+}
+
+.activeCount {
+  color: white;
+  font-weight: bold;
+  margin-left: 5px;
 }
 
 @media (max-width: 768px) {

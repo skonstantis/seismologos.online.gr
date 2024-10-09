@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import Notification from "../components/Notification"; 
-import { formatTimestamp } from "../js/helpers/formatTimestamp"; 
+import Notification from "../components/Notification";
+import { formatTimestamp } from "../js/helpers/formatTimestamp";
 
 const SessionContext = createContext();
 
@@ -13,16 +13,19 @@ export const SessionProvider = ({ children }) => {
 
   const [notificationQueue, setNotificationQueue] = useState([]);
   const [currentNotification, setCurrentNotification] = useState("");
-  const [currentColor, setCurrentColor] = useState("green"); 
+  const [currentColor, setCurrentColor] = useState("green");
 
   const [sessionValid, setSessionValid] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   const isUserRef = useRef(false);
   const usernameRef = useRef("");
   const authTokenRef = useRef("");
 
-  const socketRef = useRef(null); 
+  const socketRef = useRef(null);
+
+  const [activeUsers, setActiveUsers] = useState(0);
+  const [activeVisitors, setActiveVisitors] = useState(0);
 
   const checkSessionTimeout = 30 * 60 * 1000; // 30 minutes
   const checkSessionTimeoutIdRef = useRef(null);
@@ -32,13 +35,13 @@ export const SessionProvider = ({ children }) => {
 
   useEffect(() => {
     if (notificationQueue.length > 0) {
-      const { message, color } = notificationQueue[0]; 
+      const { message, color } = notificationQueue[0];
       setCurrentNotification(message);
-      setCurrentColor(color); 
+      setCurrentColor(color);
 
       const timeoutId = setTimeout(() => {
-        setCurrentNotification(""); 
-        setNotificationQueue((prevQueue) => prevQueue.slice(1)); 
+        setCurrentNotification("");
+        setNotificationQueue((prevQueue) => prevQueue.slice(1));
       }, notificationTimeout);
 
       return () => {
@@ -84,17 +87,25 @@ export const SessionProvider = ({ children }) => {
     const url = user
       ? `wss://seismologos.onrender.com/ws/activeUsers/${user.username}?token=${user.authToken}`
       : `wss://seismologos.onrender.com/ws/activeVisitors/`;
-    
+
     const newSocket = new WebSocket(url);
 
     newSocket.onopen = () => {
-      socketRef.current = newSocket; 
+      socketRef.current = newSocket;
       document.addEventListener("visibilitychange", handleVisibilityChange);
     };
 
     newSocket.onmessage = (event) => {
-      const message = event.data; 
-      console.log('Message received:', message); 
+      const message = JSON.parse(event.data);
+      console.log('Message received:', message);
+
+      if (message.activeUsers !== undefined) {
+        setActiveUsers(message.activeUsers);
+      }
+
+      if (message.activeVisitors !== undefined) {
+        setActiveVisitors(message.activeVisitors);
+      }
     };
 
     newSocket.onerror = (error) => {
@@ -107,12 +118,12 @@ export const SessionProvider = ({ children }) => {
   const checkSession = async (isUpdate = false) => {
     setLoading(true);
     const user = await validateSession();
-    
+
     if (user) {
       setSessionValid(true);
-      isUserRef.current = true; 
-      usernameRef.current = user.username; 
-      authTokenRef.current = user.authToken; 
+      isUserRef.current = true;
+      usernameRef.current = user.username;
+      authTokenRef.current = user.authToken;
 
       const formattedLastLogin = formatTimestamp(user.lastLogin);
 
@@ -125,20 +136,20 @@ export const SessionProvider = ({ children }) => {
           setNotificationQueue((prevQueue) => [...prevQueue, { message: notificationMessage, color: "green" }]);
         }, 100);
       }
-      
-      socketRef.current = setupSocket(user); 
+
+      socketRef.current = setupSocket(user);
     } else {
       setSessionValid(false);
-      isUserRef.current = false; 
-      usernameRef.current = ""; 
-      authTokenRef.current = ""; 
-      
+      isUserRef.current = false;
+      usernameRef.current = "";
+      authTokenRef.current = "";
+
       socketRef.current = setupSocket(null);
     }
 
     setLoading(false);
     startTimeoutRef.current = Date.now();
-    
+
     if (checkSessionTimeoutIdRef.current) {
       clearTimeout(checkSessionTimeoutIdRef.current);
     }
@@ -160,8 +171,8 @@ export const SessionProvider = ({ children }) => {
         }
       }
     } else if (document.visibilityState === "hidden") {
-      if (socketRef.current) {  
-        socketRef.current.close(); 
+      if (socketRef.current) {
+        socketRef.current.close();
         socketRef.current = null;
       } else {
         console.log("Socket is not initialized yet.");
@@ -190,32 +201,34 @@ export const SessionProvider = ({ children }) => {
 
       setNotificationQueue((prevQueue) => [...notificationsQueue, ...prevQueue]);
 
-      sessionStorage.removeItem("notifications"); 
-      sessionStorage.removeItem("notificationsColors"); 
+      sessionStorage.removeItem("notifications");
+      sessionStorage.removeItem("notificationsColors");
     }
 
-    checkSession(); 
+    checkSession();
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       if (checkSessionTimeoutIdRef.current) {
         clearTimeout(checkSessionTimeoutIdRef.current);
       }
-      if (socketRef.current) {  
-        socketRef.current.close(); 
+      if (socketRef.current) {
+        socketRef.current.close();
         socketRef.current = null;
       } else {
         console.log("Socket is not initialized yet.");
       }
     };
-  }, []); 
+  }, []);
 
   return (
-    <SessionContext.Provider value={{ 
-      sessionValid, 
-      loading, 
-      isUser: isUserRef.current, 
-      username: usernameRef.current, 
-      authToken: authTokenRef.current, 
+    <SessionContext.Provider value={{
+      sessionValid,
+      loading,
+      isUser: isUserRef.current,
+      username: usernameRef.current,
+      authToken: authTokenRef.current,
+      activeUsers,
+      activeVisitors,
       setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }])
     }}>
       {children}
@@ -224,4 +237,4 @@ export const SessionProvider = ({ children }) => {
   );
 };
 
-export default SessionProvider; 
+export default SessionProvider;

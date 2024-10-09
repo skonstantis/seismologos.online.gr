@@ -46,9 +46,23 @@ const HomeLink = () => (
   </li>
 );
 
+const ActiveUsers = ({ activeUsers }) => (
+  <li className={styles.navItem}>
+    <img className={styles.activeIcons} src="../assets/activeUsers.svg" alt="Ενεργοί Χρήστες" />
+    <span className={styles.activeCount}>{activeUsers}</span>
+  </li>
+);
+
+const ActiveVisitors = ({ activeVisitors }) => (
+  <li className={styles.navItem}>
+    <img className={styles.activeIcons} src="../assets/activeVisitors.svg" alt="Ενεργοί Επισκέπτες" />
+    <span className={styles.activeCount}>{activeVisitors}</span>
+  </li>
+);
+
 const Header = () => {
   const location = useLocation();
-  const { sessionValid, loading } = useSession();
+  const { sessionValid, loading, activeUsers, activeVisitors } = useSession();
   const isAuthPage = location.pathname !== "/";
 
   if (loading) {
@@ -61,6 +75,8 @@ const Header = () => {
       <div className={styles.navRight}>
         <ul className={styles.navList}>
           {isAuthPage && <HomeLink />}
+          <ActiveUsers activeUsers={activeUsers} />
+          <ActiveVisitors activeVisitors={activeVisitors} />
           {!loading && !sessionValid && <AuthLinks />}
           {!loading && sessionValid && <LoggedInLinks />}
         </ul>
