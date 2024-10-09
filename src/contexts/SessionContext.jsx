@@ -17,14 +17,18 @@ export const SessionProvider = ({ children }) => {
 
   const [sessionValid, setSessionValid] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [socket, setSocket] = useState(null); 
+  
+  const isUserRef = useRef(false);
+  const usernameRef = useRef("");
+  const authTokenRef = useRef("");
+
+  const socketRef = useRef(null); 
 
   const checkSessionTimeout = 30 * 60 * 1000; // 30 minutes
   const checkSessionTimeoutIdRef = useRef(null);
   const startTimeoutRef = useRef(null);
   const pausedTimeoutRef = useRef(null);
   const remainingTimeoutRef = useRef(null);
-
 
   useEffect(() => {
     if (notificationQueue.length > 0) {
@@ -63,74 +67,73 @@ export const SessionProvider = ({ children }) => {
       if (!response.ok) return false;
 
       localStorage.setItem("authToken", result.token);
-      localStorage.setItem("username", result.user.username);
-      localStorage.setItem("email", result.user.email);
       localStorage.setItem("id", result.user.id);
-      localStorage.setItem("lastLogin", result.user.lastLogin);
-      return {authToken: token, username: result.user.username, email: result.user.email, id: result.user.id, lastLogin: result.user.lastLogin };
+      return {
+        authToken: token,
+        username: result.user.username,
+        email: result.user.email,
+        id: result.user.id,
+        lastLogin: result.user.lastLogin,
+      };
     } catch (error) {
       console.error(error);
     }
   };
 
+  const setupSocket = (user) => {
+    const url = user
+      ? `wss://seismologos.onrender.com/ws/activeUsers/${user.username}?token=${user.authToken}`
+      : `wss://seismologos.onrender.com/ws/activeVisitors/`;
+    
+    const newSocket = new WebSocket(url);
+
+    newSocket.onopen = () => {
+      socketRef.current = newSocket; 
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+    };
+
+    newSocket.onmessage = (event) => {
+      const message = event.data; 
+      console.log('Message received:', message); 
+    };
+
+    newSocket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    return newSocket;
+  };
+
   const checkSession = async (isUpdate = false) => {
     setLoading(true);
     const user = await validateSession();
-    if(user == false)
-      setSessionValid(false);
-    else
-      setSessionValid(true)
+    
+    if (user) {
+      setSessionValid(true);
+      isUserRef.current = true; 
+      usernameRef.current = user.username; 
+      authTokenRef.current = user.authToken; 
 
-    if (socket) {
-      socket.close(); 
-    }
-
-    if (user != false) {
-      const username = user.username;
-      const lastLogin = user.lastLogin;
-      const authToken = user.authToken;
-      const formattedLastLogin = formatTimestamp(lastLogin);
+      const formattedLastLogin = formatTimestamp(user.lastLogin);
 
       if (!isUpdate) {
         const notificationMessage = formattedLastLogin
-          ? <div>Σύνδεση ως: {username}<br />Τελευταία σύνδεση: {formattedLastLogin}</div>
-          : <div>Σύνδεση ως: {username}</div>;
+          ? <div>Σύνδεση ως: {user.username}<br />Τελευταία σύνδεση: {formattedLastLogin}</div>
+          : <div>Σύνδεση ως: {user.username}</div>;
 
         setTimeout(() => {
           setNotificationQueue((prevQueue) => [...prevQueue, { message: notificationMessage, color: "green" }]);
         }, 100);
       }
-
-      const newSocket = new WebSocket(`wss://seismologos.onrender.com/ws/activeUsers/${username}?token=${authToken}`); 
-
-      newSocket.onopen = () => {
-        setSocket(newSocket);
-      };
-
-      newSocket.onmessage = (event) => {
-        const message = event.data; 
-        console.log('Message received:', message); 
-      };
-
-      newSocket.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-
+      
+      socketRef.current = setupSocket(user); 
     } else {
-      const newSocket = new WebSocket(`wss://seismologos.onrender.com/ws/activeVisitors/`); 
-
-      newSocket.onopen = () => {
-        setSocket(newSocket);
-      };
-
-      newSocket.onmessage = (event) => {
-        const message = event.data; 
-        console.log('Message received:', message); 
-      };
-
-      newSocket.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
+      setSessionValid(false);
+      isUserRef.current = false; 
+      usernameRef.current = ""; 
+      authTokenRef.current = ""; 
+      
+      socketRef.current = setupSocket(null);
     }
 
     setLoading(false);
@@ -141,6 +144,35 @@ export const SessionProvider = ({ children }) => {
     }
 
     checkSessionTimeoutIdRef.current = setTimeout(() => checkSession(true), checkSessionTimeout);
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") {
+      if (remainingTimeoutRef.current || pausedTimeoutRef.current != null) {
+        const timeAway = Date.now() - pausedTimeoutRef.current;
+        if (timeAway >= remainingTimeoutRef.current) checkSession();
+        else {
+          checkSessionTimeoutIdRef.current = setTimeout(
+            () => checkSession(true),
+            remainingTimeoutRef.current - timeAway
+          );
+          socketRef.current = setupSocket(isUserRef.current ? { username: usernameRef.current, authToken: authTokenRef.current } : null);
+        }
+      }
+    } else if (document.visibilityState === "hidden") {
+      if (socketRef.current) {  
+        socketRef.current.close(); 
+        socketRef.current = null;
+      } else {
+        console.log("Socket is not initialized yet.");
+      }
+      if (checkSessionTimeoutIdRef.current && startTimeoutRef.current != null) {
+        const now = Date.now();
+        clearTimeout(checkSessionTimeoutIdRef.current);
+        pausedTimeoutRef.current = now;
+        remainingTimeoutRef.current = startTimeoutRef.current + checkSessionTimeout - now;
+      }
+    }
   };
 
   useEffect(() => {
@@ -162,47 +194,34 @@ export const SessionProvider = ({ children }) => {
       sessionStorage.removeItem("notificationsColors"); 
     }
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        if (remainingTimeoutRef.current || pausedTimeoutRef.current != null) {
-          const timeAway = Date.now() - pausedTimeoutRef.current;
-          if (timeAway >= remainingTimeoutRef.current) checkSession();
-          else
-            checkSessionTimeoutIdRef.current = setTimeout(
-              () => checkSession(true),
-              remainingTimeoutRef.current - timeAway
-            );
-        }
-      } else if (document.visibilityState === "hidden") {
-        if (checkSessionTimeoutIdRef.current && startTimeoutRef.current != null) {
-          const now = Date.now();
-          clearTimeout(checkSessionTimeoutIdRef.current);
-          pausedTimeoutRef.current = now;
-          remainingTimeoutRef.current = startTimeoutRef.current + checkSessionTimeout - now;
-        }
-      }
-    };
-
     checkSession(); 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       if (checkSessionTimeoutIdRef.current) {
         clearTimeout(checkSessionTimeoutIdRef.current);
       }
-      if (socket) {
-        socket.close();
+      if (socketRef.current) {  
+        socketRef.current.close(); 
+        socketRef.current = null;
+      } else {
+        console.log("Socket is not initialized yet.");
       }
     };
   }, []); 
 
   return (
-    <SessionContext.Provider value={{ sessionValid, loading, setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }]) }}>
+    <SessionContext.Provider value={{ 
+      sessionValid, 
+      loading, 
+      isUser: isUserRef.current, 
+      username: usernameRef.current, 
+      authToken: authTokenRef.current, 
+      setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }])
+    }}>
       {children}
       {currentNotification && <Notification message={currentNotification} color={currentColor} />}
     </SessionContext.Provider>
   );
 };
 
-export default SessionProvider;
+export default SessionProvider; 

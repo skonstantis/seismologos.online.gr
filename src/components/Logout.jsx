@@ -54,9 +54,6 @@ const Logout = () => {
         
         if (response.ok) {
           localStorage.removeItem("authToken");
-          localStorage.removeItem("username");
-          localStorage.removeItem("email");
-          localStorage.removeItem("lastLogin");
           localStorage.removeItem("id");
 
           sessionStorage.setItem("notifications", "[\"Επιτυχής Αποσύνδεση\"]");
