@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 import styles from "./header.module.css";
@@ -68,6 +68,39 @@ const Header = () => {
   const { sessionValid, loading, activeUsers, activeVisitors } = useSession();
   const isAuthPage = location.pathname !== "/";
 
+  const formatNumber = (num) => {
+    if (num < 1000) {
+      return num.toString();
+    } else if (num >= 1000 && num < 1000000) {
+      const floored = Math.floor(num / 100) / 10; 
+      return `${floored} χιλ`;
+    } else {
+      const floored = Math.floor(num / 100000) / 10; 
+      return `${floored} εκ`;
+    }
+  };
+
+  const [fontSize, setFontSize] = useState("16px");
+
+  useEffect(() => {
+    const updateFontSize = () => {
+      const width = window.innerWidth;
+      const activeUsersFormatted = formatNumber(activeUsers);
+      const activeVisitorsFormatted = formatNumber(activeVisitors);
+      if (width < 455 && (activeUsersFormatted.includes("χιλ") || activeUsersFormatted.includes("εκ") ||
+          activeVisitorsFormatted.includes("χιλ") || activeVisitorsFormatted.includes("εκ"))) {
+        setFontSize("12px");
+      } else {
+        setFontSize("16px");
+      }
+    };
+
+    updateFontSize();
+
+    window.addEventListener("resize", updateFontSize);
+    return () => window.removeEventListener("resize", updateFontSize);
+  }, [activeUsers, activeVisitors]);
+
   if (loading) {
     return null;
   }
@@ -76,9 +109,9 @@ const Header = () => {
     <nav className={styles.header}>
       <LogoAndBrand />
       <div className={styles.navRight}>
-        <ul className={styles.navList}>
-          <ActiveUsers activeUsers={activeUsers} />
-          <ActiveVisitors activeVisitors={activeVisitors} />
+        <ul className={styles.navList} style={{ fontSize }}>
+          <ActiveVisitors activeVisitors={formatNumber(activeVisitors)} />
+          <ActiveUsers activeUsers={formatNumber(activeUsers)} />
           {isAuthPage && <HomeLink />}
           {!loading && !sessionValid && <AuthLinks />}
           {!loading && sessionValid && <LoggedInLinks />}
