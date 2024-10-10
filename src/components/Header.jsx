@@ -32,6 +32,9 @@ const AuthLinks = () => (
 
 const LoggedInLinks = () => (
   <li className={styles.navItem}>
+    <Link to="/profile" className={styles.link}>
+      <img className={styles.profileIcon} src="../assets/profile.svg" alt="Προφίλ" />
+    </Link>
     <Link to="/logout" className={styles.link}>
       <img className={styles.logoutIcon} src="../assets/logout.svg" alt="Αποσύνδεση" />
     </Link>
@@ -74,9 +77,9 @@ const Header = () => {
       <LogoAndBrand />
       <div className={styles.navRight}>
         <ul className={styles.navList}>
-          {isAuthPage && <HomeLink />}
           <ActiveUsers activeUsers={activeUsers} />
           <ActiveVisitors activeVisitors={activeVisitors} />
+          {isAuthPage && <HomeLink />}
           {!loading && !sessionValid && <AuthLinks />}
           {!loading && sessionValid && <LoggedInLinks />}
         </ul>

@@ -15,6 +15,7 @@ import Loading from './components/Loading';
 import ChangePassword from './components/ChangePassword';
 import ForgotPassword from './components/ForgotPassword';
 import Logout from './components/Logout';
+import Profile from './components/Profile';
 import "./App.css";
 
 const Main = () => {
@@ -33,6 +34,7 @@ const Main = () => {
       <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/logout" element={<Logout />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
