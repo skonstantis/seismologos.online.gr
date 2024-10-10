@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 import styles from "./header.module.css";
@@ -80,27 +80,6 @@ const Header = () => {
     }
   };
 
-  const [fontSize, setFontSize] = useState("16px");
-
-  useEffect(() => {
-    const updateFontSize = () => {
-      const width = window.innerWidth;
-      const activeUsersFormatted = formatNumber(activeUsers);
-      const activeVisitorsFormatted = formatNumber(activeVisitors);
-      if (width < 455 && (activeUsersFormatted.includes("χιλ") || activeUsersFormatted.includes("εκ") ||
-          activeVisitorsFormatted.includes("χιλ") || activeVisitorsFormatted.includes("εκ"))) {
-        setFontSize("12px");
-      } else {
-        setFontSize("16px");
-      }
-    };
-
-    updateFontSize();
-
-    window.addEventListener("resize", updateFontSize);
-    return () => window.removeEventListener("resize", updateFontSize);
-  }, [activeUsers, activeVisitors]);
-
   if (loading) {
     return null;
   }
@@ -109,7 +88,7 @@ const Header = () => {
     <nav className={styles.header}>
       <LogoAndBrand />
       <div className={styles.navRight}>
-        <ul className={styles.navList} style={{ fontSize }}>
+        <ul className={styles.navList}>
           <ActiveVisitors activeVisitors={formatNumber(activeVisitors)} />
           <ActiveUsers activeUsers={formatNumber(activeUsers)} />
           {isAuthPage && <HomeLink />}
