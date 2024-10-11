@@ -99,12 +99,12 @@ export const SessionProvider = ({ children }) => {
       const message = JSON.parse(event.data);
       console.log('Message received:', message);
 
-      if (message.activeUsers !== undefined) {
-        setActiveUsers(message.activeUsers);
+      if (message.active.users !== undefined) {
+        setActiveUsers(message.active.users);
       }
 
-      if (message.activeVisitors !== undefined) {
-        setActiveVisitors(message.activeVisitors);
+      if (message.active.visitors !== undefined) {
+        setActiveVisitors(message.active.visitors);
       }
     };
 
@@ -229,6 +229,7 @@ export const SessionProvider = ({ children }) => {
       authToken: authTokenRef.current,
       activeUsers,
       activeVisitors,
+      usernameRef,
       setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }])
     }}>
       {children}
