@@ -99,11 +99,8 @@ export const SessionProvider = ({ children }) => {
       const message = JSON.parse(event.data);
       console.log('Message received:', message);
 
-      if (message?.active?.users) {
+      if (message?.active) {
         setActiveUsers(message.active.users);
-      }
-
-      if (message?.active?.visitors) {
         setActiveVisitors(message.active.visitors);
       }
     };
