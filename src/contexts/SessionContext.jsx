@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import Notification from "../components/Notification";
+import { formatElapsedTime, formatElapsedTimeShort } from "../js/helpers/elapsedTime";
 import { formatTimestamp } from "../js/helpers/formatTimestamp";
 
 const SessionContext = createContext();
@@ -17,6 +18,8 @@ export const SessionProvider = ({ children }) => {
 
   const [sessionValid, setSessionValid] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const [userStatuses, setUserStatuses] = useState([]); 
 
   const isUserRef = useRef(false);
   const usernameRef = useRef("");
@@ -97,11 +100,22 @@ export const SessionProvider = ({ children }) => {
 
     newSocket.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      console.log('Message received:', message);
+      //console.log('Message received:', message);
 
       if (message?.active) {
         setActiveUsers(message.active.users);
         setActiveVisitors(message.active.visitors);
+      }
+
+      if (message?.userStatuses) {
+        const updatedUserStatuses = message.userStatuses.map(({ elapsedTime, ...userStatus }) => {
+          return {
+            ...userStatus,
+            text: formatElapsedTime(elapsedTime),
+            textShort: formatElapsedTimeShort(elapsedTime)
+          };
+        }).sort((a, b) => a.elapsedTime - b.elapsedTime); 
+        setUserStatuses(updatedUserStatuses); 
       }
     };
 
@@ -217,6 +231,10 @@ export const SessionProvider = ({ children }) => {
     };
   }, []);
 
+  useEffect(() => {
+    console.log('Updated userStatuses:', userStatuses);
+  }, [userStatuses]);
+
   return (
     <SessionContext.Provider value={{
       sessionValid,
@@ -226,6 +244,7 @@ export const SessionProvider = ({ children }) => {
       authToken: authTokenRef.current,
       activeUsers,
       activeVisitors,
+      userStatuses, 
       usernameRef,
       setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }])
     }}>
