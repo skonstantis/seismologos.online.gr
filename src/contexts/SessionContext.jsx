@@ -19,7 +19,7 @@ export const SessionProvider = ({ children }) => {
   const [sessionValid, setSessionValid] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [userStatuses, setUserStatuses] = useState([]); 
+  const [userStatuses, setUserStatuses] = useState(null); 
 
   const isUserRef = useRef(false);
   const usernameRef = useRef("");
@@ -100,7 +100,7 @@ export const SessionProvider = ({ children }) => {
 
     newSocket.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      //console.log('Message received:', message);
+      console.log('Message received:', message);
 
       if (message?.active) {
         setActiveUsers(message.active.users);
@@ -232,7 +232,7 @@ export const SessionProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log('Updated userStatuses:', userStatuses);
+    //console.log('Updated userStatuses:', userStatuses);
   }, [userStatuses]);
 
   return (

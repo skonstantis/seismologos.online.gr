@@ -1,5 +1,5 @@
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
+import LeftWrapper from "./LeftWrapper";
 
 const Home = () => {
   useEffect(() => {
@@ -8,7 +8,7 @@ const Home = () => {
 
   return (
     <div>
-      <h1>Αρχική todo page</h1>
+      <LeftWrapper />
     </div>
   );
 };

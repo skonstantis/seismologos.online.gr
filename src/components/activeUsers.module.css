@@ -1,0 +1,80 @@
+.userListWrapper {
+    background-color: rgb(35, 52, 97); 
+    max-height: 150px;
+    overflow-y: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    overflow: visible;
+}
+
+.activeUsersNavContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.activeUsersNavButton {
+    background-color: rgb(18, 31, 65);
+    width: 60%;
+    padding: 3px;
+    text-align: center;
+    color: rgb(199, 199, 199);
+}
+
+.active {
+    background-color: rgb(35, 52, 97); 
+    font-weight: bold;
+    color: white;
+    border-bottom: 2px solid white;
+}
+
+.user {
+    display: flex;
+    justify-content: left;
+}
+
+.username {
+    position: relative;
+    margin: 3px 10px;
+    text-align: left;
+    width: 83px;
+    overflow: hidden; 
+}
+
+.textShort {
+    margin: 3px 10px;
+}
+
+.usernameScroll {
+    display: inline-block; 
+    white-space: nowrap; 
+    animation: scroll 20s linear infinite; 
+    overflow: hidden; 
+    margin-bottom: -5px;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(10%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.heading
+{
+    font-weight: bolder;
+    color: white;
+    background-color: rgb(35, 52, 97); 
+    padding: 5px;
+}
+
+.none
+{
+    padding: 3px;
+}
+
+.userNow
+{
+    padding: 3px 10px;
+}

@@ -38,14 +38,14 @@ export const formatElapsedTimeShort = (elapsedTime) => {
     const weeks = Math.floor(days / 7);
 
     if (seconds < 60) {
-        return `${seconds} δ`;
+        return `${seconds}δ`;
     } else if (minutes < 60) {
-        return `${minutes} λ`;
+        return `${minutes}λ`;
     } else if (hours < 24) {
-        return `${hours} ω`;
+        return `${hours}ω`;
     } else if (days < 7) {
-        return `${days} μ`;
+        return `${days}μ`;
     } else {
-        return `${weeks} ε `;
+        return `${weeks}ε `;
     }
 };

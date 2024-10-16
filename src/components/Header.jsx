@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
+import { formatNumber } from "../js/helpers/formatNumber";
 import styles from "./header.module.css";
 
 const LogoAndBrand = () => (
@@ -67,18 +68,6 @@ const Header = () => {
   const location = useLocation();
   const { sessionValid, loading, activeUsers, activeVisitors } = useSession();
   const isAuthPage = location.pathname !== "/";
-
-  const formatNumber = (num) => {
-    if (num < 1000) {
-      return num.toString();
-    } else if (num >= 1000 && num < 1000000) {
-      const floored = Math.floor(num / 100) / 10; 
-      return `${floored} χιλ`;
-    } else {
-      const floored = Math.floor(num / 100000) / 10; 
-      return `${floored} εκ`;
-    }
-  };
 
   if (loading) {
     return null;

@@ -1,0 +1,8 @@
+.leftWrapper {
+    position: absolute;
+    width: fit-content;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    margin-left: 10px;
+}
