@@ -4,7 +4,7 @@ import { formatNumber } from "../js/helpers/formatNumber";
 import styles from "./activeUsers.module.css"; 
 
 const UsersActive = ({ userStatuses }) => {
-  const activeUsers = userStatuses?.filter(status => status.textShort === 'τώρα');
+  const activeUsers = userStatuses?.filter(status => status.textShort === 'τώρα').sort((a, b) => a.elapsedTime - b.elapsedTime); ;
   return (
     <div className={styles.userListWrapper}>
       {activeUsers && activeUsers.length > 0 ? (
@@ -93,7 +93,7 @@ const ActiveUsers = () => {
   const [selectedList, setSelectedList] = useState('now');
 
   return (
-    <div className={styles.leftWrapper}>
+    userStatuses && <div className={styles.leftWrapper}>
       <div className={styles.heading}>Συνδεδεμένοι Χρήστες</div>
       <ActiveUsersNav userStatuses={userStatuses} selectedList={selectedList} setSelectedList={setSelectedList} />
       {selectedList === 'now' && <UsersActive userStatuses={userStatuses} />}

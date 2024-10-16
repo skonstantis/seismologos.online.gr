@@ -111,6 +111,7 @@ export const SessionProvider = ({ children }) => {
         const updatedUserStatuses = message.userStatuses.map(({ elapsedTime, ...userStatus }) => {
           return {
             ...userStatus,
+            elapsedTime,
             text: formatElapsedTime(elapsedTime),
             textShort: formatElapsedTimeShort(elapsedTime)
           };

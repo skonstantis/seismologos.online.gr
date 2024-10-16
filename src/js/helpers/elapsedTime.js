@@ -44,8 +44,8 @@ export const formatElapsedTimeShort = (elapsedTime) => {
     } else if (hours < 24) {
         return `${hours}ω`;
     } else if (days < 7) {
-        return `${days}μ`;
+        return `${days}ημ`;
     } else {
-        return `${weeks}ε `;
+        return `${weeks}εβ `;
     }
 };
