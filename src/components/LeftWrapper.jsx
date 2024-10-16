@@ -1,4 +1,3 @@
-// LeftWrapper.js
 import React from "react";
 import ActiveUsers from "./ActiveUsers"; 
 import styles from "./leftWrapper.module.css";
