@@ -1,3 +1,24 @@
+.show
+{
+    width: 15px;
+    position: absolute;
+    left: 0px;
+}
+
+.showShown
+{
+    background-color: rgb(35, 52, 97); 
+    padding: 4px;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+
+.wrapper
+{
+    margin-left: 19px;
+}
+
 .userListWrapper {
     background-color: rgb(35, 52, 97); 
     max-height: 150px;
@@ -33,14 +54,17 @@
 
 .username {
     position: relative;
-    margin: 3px 10px;
+    margin: 3px;
     text-align: left;
-    width: 83px;
+    width: 80px;
     overflow: hidden; 
+    text-align: center;
 }
 
 .textShort {
-    margin: 3px 10px;
+    margin: 3px;
+    width: 80px;
+    text-align: center;
 }
 
 .usernameScroll {
@@ -60,20 +84,9 @@
     }
 }
 
-.heading
-{
+.heading {
     font-weight: bolder;
     color: white;
     background-color: rgb(35, 52, 97); 
     padding: 5px;
-}
-
-.none
-{
-    padding: 3px;
-}
-
-.userNow
-{
-    padding: 3px 10px;
 }

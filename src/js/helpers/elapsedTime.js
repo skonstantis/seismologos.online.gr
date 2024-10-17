@@ -2,7 +2,7 @@ export const formatElapsedTime = (elapsedTime) => {
 
     if(elapsedTime == 0)
     {
-        return 'ενεργός τώρα';
+        return "ενεργός τώρα";
     }
 
     const seconds = Math.floor(elapsedTime / 1000);
@@ -12,15 +12,15 @@ export const formatElapsedTime = (elapsedTime) => {
     const weeks = Math.floor(days / 7);
 
     if (seconds < 60) {
-        return `ενεργός ${seconds} ${seconds === 1 ? 'δευτερόλεπτο' : 'δευτερόλεπτα'} πρίν`;
+        return `ενεργός ${seconds} ${seconds === 1 ? "δευτερόλεπτο" : "δευτερόλεπτα"} πρίν`;
     } else if (minutes < 60) {
-        return `ενεργός ${minutes} ${minutes === 1 ? 'λεπτό' : 'λεπτά'} πρίν`;
+        return `ενεργός ${minutes} ${minutes === 1 ? "λεπτό" : "λεπτά"} πρίν`;
     } else if (hours < 24) {
-        return `ενεργός ${hours} ${hours === 1 ? 'ώρα' : 'ώρες'} πρίν`;
+        return `ενεργός ${hours} ${hours === 1 ? "ώρα" : "ώρες"} πρίν`;
     } else if (days < 7) {
-        return `ενεργός ${days} ${days === 1 ? 'μέρα' : 'μέρες'} πρίν`;
+        return `ενεργός ${days} ${days === 1 ? "μέρα" : "μέρες"} πρίν`;
     } else {
-        return `ενεργός ${weeks} ${weeks === 1 ? 'εβδομάδα' : 'εβδομάδες'} πρίν`;
+        return `ενεργός ${weeks} ${weeks === 1 ? "εβδομάδα" : "εβδομάδες"} πρίν`;
     }
 };
 
@@ -28,7 +28,7 @@ export const formatElapsedTimeShort = (elapsedTime) => {
 
     if(elapsedTime == 0)
     {
-        return 'τώρα';
+        return "τώρα";
     }
 
     const seconds = Math.floor(elapsedTime / 1000);

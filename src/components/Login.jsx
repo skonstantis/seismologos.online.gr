@@ -18,7 +18,7 @@ const Login = () => {
   const params = new URLSearchParams(location.search);
 
   useEffect(() => {
-    const verified = params.get('verified') === 'true'; 
+    const verified = params.get("verified") === "true"; 
     const checkLogout = async () => {
       if (sessionValid) {
         if(verified)

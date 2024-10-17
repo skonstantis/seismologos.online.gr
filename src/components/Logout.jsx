@@ -14,7 +14,7 @@ const Logout = () => {
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
-  const innerRedirect = queryParams.get('innerRedirect'); 
+  const innerRedirect = queryParams.get("innerRedirect"); 
 
   useEffect(() => {
     if (!sessionValid && !innerRedirect) {

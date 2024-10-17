@@ -1,6 +1,6 @@
-import React from 'react';
-import { useEffect } from 'react';
-import styles from './notFound.module.css'; 
+import React from "react";
+import { useEffect } from "react";
+import styles from "./notFound.module.css"; 
 
 const NotFound = () => {
   useEffect(() => {
