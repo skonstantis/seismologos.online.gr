@@ -96,26 +96,36 @@ const ActiveUsersNav = ({ searchElements, selectedList, setSelectedList }) => {
 };
 
 const ActiveUsers = () => {
-  if(!localStorage.getItem("selectedListActiveUsers"))
+  if (!localStorage.getItem("selectedListActiveUsers")) {
     localStorage.setItem("selectedListActiveUsers", "now");
+  }
 
-  if(!JSON.parse(localStorage.getItem("showActiveUsersPanel")))
+  if (!JSON.parse(localStorage.getItem("showActiveUsersPanel"))) {
     localStorage.setItem("showActiveUsersPanel", false);
+  }
 
   const { userStatuses } = useSession();
   const [selectedList, setSelectedList] = useState(localStorage.getItem("selectedListActiveUsers"));
   const [show, setShow] = useState(JSON.parse(localStorage.getItem("showActiveUsersPanel")));
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState(userStatuses);
+  const [searchResults, setSearchResults] = useState(userStatuses || []); 
 
   const handleToggleShow = () => {
-    localStorage.setItem("showActiveUsersPanel", !JSON.parse(localStorage.getItem("showActiveUsersPanel")));
-    setShow(!show);
+    const newShowStatus = !JSON.parse(localStorage.getItem("showActiveUsersPanel"));
+    localStorage.setItem("showActiveUsersPanel", newShowStatus);
+    setShow(newShowStatus);
   };
 
   useEffect(() => {
-    setSearchResults(userStatuses);
-  }, [userStatuses]);
+    if (userStatuses) {
+      const filteredResults = userStatuses.filter(status =>
+        status.username.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchResults(filteredResults);
+    } else {
+      setSearchResults([]); 
+    }
+  }, [userStatuses, searchTerm]); 
 
   return (
     <>
@@ -125,7 +135,7 @@ const ActiveUsers = () => {
         alt={show ? "Απόκρυψη" : "Εμφάνιση"} 
         onClick={handleToggleShow} 
       />
-      {(show && searchResults) && 
+      {show && searchResults && 
         <div className={styles.wrapper}>
           <div className={styles.heading}>Συνδεδεμένοι Χρήστες</div>
           <ActiveUsersNav 

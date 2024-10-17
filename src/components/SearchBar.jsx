@@ -7,25 +7,29 @@ const SearchBar = ({
   setSearchTerm,
   setSearchResults,
   placeholder = "Αναζήτηση",
-  inputClassName ,
+  inputClassName,
   barClassName,
 }) => {
   useEffect(() => {
-    const results = searchElements.filter(element =>
-      element.username.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setSearchResults(results);
+    if (Array.isArray(searchElements)) { 
+      const results = searchElements.filter(element =>
+        element.username.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchResults(results);
+    } else {
+      setSearchResults([]); 
+    }
   }, [searchTerm, searchElements, setSearchResults]);
 
   return (
     <div className={barClassName || styles.searchBar}>
-        <input
+      <input
         type="text"
-        className={inputClassName || styles.searchInput} 
+        className={inputClassName || styles.searchInput}
         placeholder={placeholder}
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
-        />
+      />
     </div>
   );
 };
