@@ -63,7 +63,8 @@
 
 .textShort {
     margin: 3px;
-    width: 80px;
+    margin-left: 10px;
+    width: 60px;
     text-align: center;
 }
 
@@ -90,3 +91,20 @@
     background-color: rgb(35, 52, 97); 
     padding: 5px;
 }
+
+.searchInput
+{
+  width: 150px;
+  margin: 4px;
+  border: 2px solid rgb(255, 255, 255);
+  color: rgb(35, 52, 97); ;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.searchBar {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    background-color: rgb(35, 52, 97); 
+}
+  

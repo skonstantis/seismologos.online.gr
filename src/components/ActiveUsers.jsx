@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "../contexts/SessionContext";
 import { formatNumber } from "../js/helpers/formatNumber";
-import styles from "./activeUsers.module.css"; 
+import styles from "./activeUsers.module.css";
+import SearchBar from "./SearchBar"; 
 
 const UserItem = ({ status }) => {
   const usernameRef = useRef(null);
@@ -31,8 +32,8 @@ const UserItem = ({ status }) => {
   );
 };
 
-const UsersActive = ({ userStatuses }) => {
-  const activeUsers = userStatuses?.filter(status => status.textShort === "τώρα").sort((a, b) => a.elapsedTime - b.elapsedTime);
+const UsersActive = ({ searchElements }) => {
+  const activeUsers = searchElements?.filter(status => status.textShort === "τώρα").sort((a, b) => a.elapsedTime - b.elapsedTime);
   return (
     <div className={styles.userListWrapper}>
       {activeUsers && activeUsers.length > 0 && (
@@ -44,8 +45,8 @@ const UsersActive = ({ userStatuses }) => {
   );
 };
 
-const UsersRecentlyActive = ({ userStatuses }) => {
-  const recentlyActiveUsers = userStatuses?.filter(status => status.textShort !== "τώρα");
+const UsersRecentlyActive = ({ searchElements }) => {
+  const recentlyActiveUsers = searchElements?.filter(status => status.textShort !== "τώρα");
   return (
     <div className={styles.userListWrapper}>
       {recentlyActiveUsers && recentlyActiveUsers.length > 0 && (
@@ -57,7 +58,7 @@ const UsersRecentlyActive = ({ userStatuses }) => {
   );
 };
 
-const ActiveUsersNav = ({ userStatuses, selectedList, setSelectedList }) => {
+const ActiveUsersNav = ({ searchElements, selectedList, setSelectedList }) => {
   return (
     <div className={styles.activeUsersNavContainer}>
       <div
@@ -72,7 +73,7 @@ const ActiveUsersNav = ({ userStatuses, selectedList, setSelectedList }) => {
         <div>
           Τώρα
           <br />
-          ({formatNumber(userStatuses?.filter(status => status.textShort === "τώρα").length)})
+          ({formatNumber(searchElements?.filter(status => status.textShort === "τώρα").length)})
         </div>
       </div>
       <div
@@ -87,7 +88,7 @@ const ActiveUsersNav = ({ userStatuses, selectedList, setSelectedList }) => {
         <div>
           Πρόσφατα
           <br />
-          ({formatNumber(userStatuses?.filter(status => status.textShort !== "τώρα").length)})
+          ({formatNumber(searchElements?.filter(status => status.textShort !== "τώρα").length)})
         </div>
       </div>
     </div>
@@ -104,31 +105,48 @@ const ActiveUsers = () => {
   const { userStatuses } = useSession();
   const [selectedList, setSelectedList] = useState(localStorage.getItem("selectedListActiveUsers"));
   const [show, setShow] = useState(JSON.parse(localStorage.getItem("showActiveUsersPanel")));
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState(userStatuses);
 
   const handleToggleShow = () => {
     localStorage.setItem("showActiveUsersPanel", !JSON.parse(localStorage.getItem("showActiveUsersPanel")));
     setShow(!show);
   };
-  
+
+  useEffect(() => {
+    setSearchResults(userStatuses);
+  }, [userStatuses]);
+
   return (
-      <>
-        <img 
-          className={`${styles.show} ${show ? styles.showShown : ''}`} 
-          src={show ? "../assets/collapseList.svg" : "../assets/showList.svg"} 
-          alt={show ? "Απόκρυψη" : "Εμφάνιση"} 
-          onClick={handleToggleShow} 
-        />
-        {(show && userStatuses) && 
-          <div className={styles.wrapper}>
-            <div className={styles.heading}>Συνδεδεμένοι Χρήστες</div>
-            <ActiveUsersNav userStatuses={userStatuses} selectedList={selectedList} setSelectedList={setSelectedList} />
-            {selectedList === "now" && <UsersActive userStatuses={userStatuses} />}
-            {selectedList === "recent" && <UsersRecentlyActive userStatuses={userStatuses} />}
-          </div>
-        }
-      </>
+    <>
+      <img 
+        className={`${styles.show} ${show ? styles.showShown : ''}`} 
+        src={show ? "../assets/collapseList.svg" : "../assets/showList.svg"} 
+        alt={show ? "Απόκρυψη" : "Εμφάνιση"} 
+        onClick={handleToggleShow} 
+      />
+      {(show && searchResults) && 
+        <div className={styles.wrapper}>
+          <div className={styles.heading}>Συνδεδεμένοι Χρήστες</div>
+          <ActiveUsersNav 
+            searchElements={searchResults} 
+            selectedList={selectedList} 
+            setSelectedList={setSelectedList} 
+          />
+          <SearchBar
+            searchElements={userStatuses}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            setSearchResults={setSearchResults}
+            inputClassName={styles.searchInput} 
+            barClassName={styles.searchBar}
+          />
+          {selectedList === "now" && <UsersActive searchElements={searchResults} />}
+          {selectedList === "recent" && <UsersRecentlyActive searchElements={searchResults} />}
+        </div>
+      }
+    </>
   );
-  
 };
 
 export default ActiveUsers;
