@@ -145,7 +145,7 @@ const ActiveUsers = () => {
         }
         {show && searchResults && (
           <div>
-            <div className={styles.heading}>Συνδεδεμένοι Χρήστες</div>
+            <div className={styles.heading}>&nbsp;&nbsp;&nbsp;&nbsp;Συνδεδεμένοι Χρήστες</div>
             <ActiveUsersNav 
               searchElements={searchResults} 
               selectedList={selectedList} 

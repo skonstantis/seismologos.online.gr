@@ -1,20 +1,41 @@
 .show
 {
-    width: 15px;
+    width: 18px;
     position: absolute;
     left: 4px;
-    background-color: rgb(35, 52, 97); 
-    padding: 8.65px 6px;
-    border-bottom-left-radius: 10px;
-    border-top-left-radius: 10px;
+    top: 7px;
+    margin-right: 5px;
 }
-
 
 .wrapper
 {
-    margin-left: 19px;
+    position: relative;
     margin-top: 20px;
     width: fit-content;
+}
+
+.heading,
+.headingClosed
+{
+    font-weight: bolder;
+    color: white;
+    background-color: rgb(35, 52, 97); 
+    padding: 7.7px;
+    font-size: 16px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+.headingClosed
+{
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.usersIcon
+{
+    width: 25px;
+    margin-left: 20px;
 }
 
 .userListWrapper {
@@ -83,23 +104,6 @@
     }
 }
 
-.heading,
-.headingClosed
-{
-    font-weight: bolder;
-    color: white;
-    background-color: rgb(35, 52, 97); 
-    padding: 7px;
-    font-size: 16px;
-    border-top-right-radius: 10px;
-}
-
-.headingClosed
-{
-    border-bottom-right-radius: 10px;
-    padding: 5px;
-}
-
 .searchInput
 {
   width: 150px;
@@ -114,10 +118,4 @@
     padding-top: 4px;
     padding-bottom: 4px;
     background-color: rgb(35, 52, 97); 
-}
-
-.usersIcon
-{
-    margin-left: 4px;
-    width: 25px;
 }
