@@ -2,13 +2,9 @@
 {
     width: 15px;
     position: absolute;
-    left: 0px;
-}
-
-.showShown
-{
+    left: 4px;
     background-color: rgb(35, 52, 97); 
-    padding: 4px;
+    padding: 8.65px 6px;
     border-bottom-left-radius: 10px;
     border-top-left-radius: 10px;
 }
@@ -17,6 +13,8 @@
 .wrapper
 {
     margin-left: 19px;
+    margin-top: 20px;
+    width: fit-content;
 }
 
 .userListWrapper {
@@ -85,10 +83,20 @@
     }
 }
 
-.heading {
+.heading,
+.headingClosed
+{
     font-weight: bolder;
     color: white;
     background-color: rgb(35, 52, 97); 
+    padding: 7px;
+    font-size: 16px;
+    border-top-right-radius: 10px;
+}
+
+.headingClosed
+{
+    border-bottom-right-radius: 10px;
     padding: 5px;
 }
 
@@ -107,4 +115,9 @@
     padding-bottom: 4px;
     background-color: rgb(35, 52, 97); 
 }
-  
+
+.usersIcon
+{
+    margin-left: 4px;
+    width: 25px;
+}

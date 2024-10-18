@@ -129,34 +129,44 @@ const ActiveUsers = () => {
 
   return (
     <>
-      <img 
-        className={`${styles.show} ${show ? styles.showShown : ''}`} 
-        src={show ? "../assets/collapseList.svg" : "../assets/showList.svg"} 
-        alt={show ? "Απόκρυψη" : "Εμφάνιση"} 
-        onClick={handleToggleShow} 
-      />
-      {show && searchResults && 
-        <div className={styles.wrapper}>
-          <div className={styles.heading}>Συνδεδεμένοι Χρήστες</div>
-          <ActiveUsersNav 
-            searchElements={searchResults} 
-            selectedList={selectedList} 
-            setSelectedList={setSelectedList} 
-          />
-          <SearchBar
-            searchElements={userStatuses}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            setSearchResults={setSearchResults}
-            inputClassName={styles.searchInput} 
-            barClassName={styles.searchBar}
-          />
-          {selectedList === "now" && <UsersActive searchElements={searchResults} />}
-          {selectedList === "recent" && <UsersRecentlyActive searchElements={searchResults} />}
-        </div>
-      }
+      <div className={styles.wrapper}>
+        <img 
+          className={styles.show} 
+          src={show ? "../assets/collapseList.svg" : "../assets/showList.svg"} 
+          alt={show ? "Απόκρυψη" : "Εμφάνιση"} 
+          onClick={handleToggleShow} 
+        />
+        {!show && searchResults && 
+          <>
+            <div className={styles.headingClosed}>
+                <img className={styles.usersIcon} src="../assets/activeUsers.svg" alt="Συνδεδεμένοι Χρήστες" /></div>
+            <br/>
+          </>
+        }
+        {show && searchResults && (
+          <div>
+            <div className={styles.heading}>Συνδεδεμένοι Χρήστες</div>
+            <ActiveUsersNav 
+              searchElements={searchResults} 
+              selectedList={selectedList} 
+              setSelectedList={setSelectedList} 
+            />
+            <SearchBar
+              searchElements={userStatuses}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              setSearchResults={setSearchResults}
+              inputClassName={styles.searchInput} 
+              barClassName={styles.searchBar}
+            />
+            {selectedList === "now" && <UsersActive searchElements={searchResults} />}
+            {selectedList === "recent" && <UsersRecentlyActive searchElements={searchResults} />}
+          </div>
+        )}
+      </div>
     </>
   );
+  
 };
 
 export default ActiveUsers;

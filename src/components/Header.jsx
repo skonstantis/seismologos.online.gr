@@ -52,7 +52,7 @@ const HomeLink = () => (
 
 const ActiveUsers = ({ activeUsers }) => (
   <li className={styles.navItem}>
-    <img className={styles.activeIcons} src="../assets/activeUsers.svg" alt="Ενεργοί Χρήστες" />
+    <img className={styles.activeIcons} src="../assets/activeUsers.svg" alt="Συνδεδεμένοι Χρήστες" />
     <span className={styles.activeCount}>{activeUsers}</span>
   </li>
 );
