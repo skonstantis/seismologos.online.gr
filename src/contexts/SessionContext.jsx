@@ -151,6 +151,7 @@ export const SessionProvider = ({ children }) => {
 
       socketRef.current = setupSocket(user);
     } else {
+      localStorage.removeItem("unsentMessage"); 
       setSessionValid(false);
       isUserRef.current = false;
       usernameRef.current = "";

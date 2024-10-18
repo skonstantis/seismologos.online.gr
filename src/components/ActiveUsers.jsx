@@ -148,13 +148,15 @@ const ActiveUsers = () => {
         {!show && searchResults && 
           <>
             <div className={styles.headingClosed}>
-                <img className={styles.usersIcon} src="../assets/activeUsers.svg" alt="Συνδεδεμένοι Χρήστες" /></div>
+                <img className={styles.usersIcon} src="../assets/activeUsers.svg" alt="Συνδεδεμένοι Χρήστες" />
+            </div>
             <br/>
           </>
         }
         {show && searchResults && (
           <div>
-            <div className={styles.heading}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Συνδεδεμένοι Χρήστες</div>
+            <div className={styles.heading}>
+                <img className={styles.usersIcon} src="../assets/activeUsers.svg" alt="Συνδεδεμένοι Χρήστες" /></div>
             <ActiveUsersNav 
               searchElements={searchResults} 
               selectedList={selectedList} 

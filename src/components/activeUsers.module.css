@@ -2,8 +2,8 @@
 {
     width: 18px;
     position: absolute;
-    left: 4px;
-    top: 7px;
+    left: 7px;
+    top: 5px;
     margin-right: 5px;
 }
 
@@ -19,7 +19,7 @@
 {
     font-weight: bolder;
     color: white;
-    background-color: rgb(35, 52, 97); 
+    background-color: rgb(18, 31, 65); 
     padding: 7.7px;
     font-size: 16px;
     border-top-right-radius: 10px;
@@ -36,6 +36,7 @@
 {
     width: 25px;
     margin-left: 20px;
+    padding: 3px;
 }
 
 .userListWrapperOuter {
@@ -60,7 +61,7 @@
 }
 
 .activeUsersNavButton {
-    background-color: rgb(18, 31, 65);
+    background-color: rgb(35, 52, 97); 
     width: 60%;
     padding: 3px;
     text-align: center;
@@ -68,7 +69,7 @@
 }
 
 .active {
-    background-color: rgb(35, 52, 97); 
+    background-color: rgb(18, 31, 65);
     font-weight: bold;
     color: white;
     border-bottom: 2px solid white;
@@ -83,14 +84,12 @@
     position: relative;
     margin: 3px;
     text-align: left;
-    width: 120px;
+    width: 100px;
     overflow: hidden; 
     text-align: center;
 }
 
 .textShort {
-    margin: 3px;
-    margin-left: 10px;
     width: 40px;
     text-align: center;
 }
