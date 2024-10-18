@@ -44,7 +44,7 @@ const Chat = () => {
         </div>
       ) : (
         <div>
-          <div className={styles.heading}>&nbsp;&nbsp;&nbsp;&nbsp;Chat</div>
+          <div className={styles.heading}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Chat</div>
           <ChatNav />
           <ChatBody />
         </div>

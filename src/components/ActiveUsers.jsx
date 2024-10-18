@@ -35,12 +35,14 @@ const UserItem = ({ status }) => {
 const UsersActive = ({ searchElements }) => {
   const activeUsers = searchElements?.filter(status => status.textShort === "τώρα").sort((a, b) => a.elapsedTime - b.elapsedTime);
   return (
-    <div className={styles.userListWrapper}>
-      {activeUsers && activeUsers.length > 0 && (
-        activeUsers.map((status, index) => (
-          <UserItem key={index} status={status} />
-        ))
-      )}
+    <div className={styles.userListWrapperOuter}>
+      <div className={styles.userListWrapperInner}>
+        {activeUsers && activeUsers.length > 0 && (
+          activeUsers.map((status, index) => (
+            <UserItem key={index} status={status} />
+          ))
+        )}
+      </div>
     </div>
   );
 };
@@ -48,15 +50,18 @@ const UsersActive = ({ searchElements }) => {
 const UsersRecentlyActive = ({ searchElements }) => {
   const recentlyActiveUsers = searchElements?.filter(status => status.textShort !== "τώρα");
   return (
-    <div className={styles.userListWrapper}>
-      {recentlyActiveUsers && recentlyActiveUsers.length > 0 && (
-        recentlyActiveUsers.map((status, index) => (
-          <UserItem key={index} status={status} />
-        ))
-      )}
+    <div className={styles.userListWrapperOuter}>
+      <div className={styles.userListWrapperInner}>
+        {recentlyActiveUsers && recentlyActiveUsers.length > 0 && (
+          recentlyActiveUsers.map((status, index) => (
+            <UserItem key={index} status={status} />
+          ))
+        )}
+      </div>
     </div>
   );
 };
+
 
 const ActiveUsersNav = ({ searchElements, selectedList, setSelectedList }) => {
   return (
@@ -125,7 +130,11 @@ const ActiveUsers = () => {
     } else {
       setSearchResults([]); 
     }
-  }, [userStatuses, searchTerm]); 
+  }, [userStatuses, searchTerm]);
+
+  const isActiveListEmpty = selectedList === "now"
+    ? searchResults.filter(status => status.textShort === "τώρα").length === 0
+    : searchResults.filter(status => status.textShort !== "τώρα").length === 0;
 
   return (
     <>
@@ -145,7 +154,7 @@ const ActiveUsers = () => {
         }
         {show && searchResults && (
           <div>
-            <div className={styles.heading}>&nbsp;&nbsp;&nbsp;&nbsp;Συνδεδεμένοι Χρήστες</div>
+            <div className={styles.heading}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Συνδεδεμένοι Χρήστες</div>
             <ActiveUsersNav 
               searchElements={searchResults} 
               selectedList={selectedList} 
@@ -157,7 +166,7 @@ const ActiveUsers = () => {
               setSearchTerm={setSearchTerm}
               setSearchResults={setSearchResults}
               inputClassName={styles.searchInput} 
-              barClassName={styles.searchBar}
+              barClassName={isActiveListEmpty ? styles.searchBarEmpty : styles.searchBar}
             />
             {selectedList === "now" && <UsersActive searchElements={searchResults} />}
             {selectedList === "recent" && <UsersRecentlyActive searchElements={searchResults} />}
@@ -166,7 +175,6 @@ const ActiveUsers = () => {
       </div>
     </>
   );
-  
 };
 
 export default ActiveUsers;
