@@ -16,6 +16,7 @@ import ChangePassword from "./components/ChangePassword";
 import ForgotPassword from "./components/ForgotPassword";
 import Logout from "./components/Logout";
 import Profile from "./components/Profile";
+import ChatPolicy from "./components/chatPolicy";
 import "./App.css";
 
 const Main = () => {
@@ -35,6 +36,7 @@ const Main = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/chat-policy" element={<ChatPolicy />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from "react";
 import styles from "./chat.module.css";
 import { useSession } from "../contexts/SessionContext";
+import { Link } from "react-router-dom";
 
 const chatBufferSize = 50;
+
+const ChatFooter = ({ message }) => {
+  return (
+    <div className={styles.chatFooter}>
+      <Link to="/chat-policy" className={styles.link}>
+        Κανονισμός Chat
+      </Link>
+      <div className={styles.charCount}>{message.length}/{chatBufferSize}</div>
+    </div>
+  );
+};
 
 const ChatHeader = () => {
   return (
@@ -88,7 +100,6 @@ const ChatMessage = ({ sessionValid, setMessage }) => {
         value={inputValue}
         disabled={!sessionValid}
       />
-      <div className={styles.charCount}>{inputValue.length}/{chatBufferSize}</div>
     </div>
   );
 };
@@ -129,6 +140,7 @@ const Chat = () => {
           <ChatHeader />          
           <ChatBody />
           <ChatMessage sessionValid={sessionValid} setMessage={setMessage} />
+          <ChatFooter message={message}/>
         </div>
       )}
     </div>
