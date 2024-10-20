@@ -63,7 +63,10 @@ const ChatMessage = ({ sessionValid, setMessage }) => {
 
       const result = await response.json();
       console.log("Message sent successfully", result);
-      localStorage.removeItem("unsentMessage"); 
+      
+      localStorage.removeItem("unsentMessage");
+      setInputValue("");
+      setMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -72,7 +75,6 @@ const ChatMessage = ({ sessionValid, setMessage }) => {
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && inputValue.trim()) {
       sendMessage(inputValue);
-      setInputValue("");
     }
   };
 
@@ -92,7 +94,7 @@ const ChatMessage = ({ sessionValid, setMessage }) => {
         placeholder={
           sessionValid
             ? "Πληκτρολογήστε το μήνυμα σας εδώ"
-            : "Εγγραφείτε ή συνδεθείτε για να συμμετέχετε"
+            : "Λειτουργία μόνο για Χρήστες"
         }
         className={`${styles.chatInput} ${inputValue.length >= chatBufferSize ? styles.error : ""}`}
         onChange={handleChange}

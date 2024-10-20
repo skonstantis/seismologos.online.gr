@@ -102,3 +102,10 @@
   right: 10px;
   padding: 5px;
 }
+
+
+@media (min-height: 673px) {
+  .chatBody {
+      height: calc(100vh - 673px + 200px);
+  }
+}
