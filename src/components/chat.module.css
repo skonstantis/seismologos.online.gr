@@ -42,7 +42,7 @@
 
 .chatBody {
   background-color: rgb(35, 52, 97);
-  height: calc(100vh - 673px);
+  height: calc(100vh - 573px);
 }
 
 .chatMessage {
