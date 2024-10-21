@@ -22,8 +22,9 @@ export const SessionProvider = ({ children }) => {
   const [userStatuses, setUserStatuses] = useState(null); 
 
   const isUserRef = useRef(false);
-  const usernameRef = useRef("");
   const authTokenRef = useRef("");
+  const idRef = useRef("");
+  const usernameRef = useRef("");
 
   const socketRef = useRef(null);
 
@@ -73,6 +74,7 @@ export const SessionProvider = ({ children }) => {
       if (!response.ok) return false;
 
       localStorage.setItem("authToken", result.token);
+      authTokenRef.current = result.token;
       localStorage.setItem("id", result.user.id);
       return {
         authToken: token,
@@ -134,8 +136,8 @@ export const SessionProvider = ({ children }) => {
     if (user) {
       setSessionValid(true);
       isUserRef.current = true;
+      idRef.current = user.id;
       usernameRef.current = user.username;
-      authTokenRef.current = user.authToken;
 
       const formattedLastLogin = formatTimestamp(user.lastLogin);
 
@@ -154,8 +156,9 @@ export const SessionProvider = ({ children }) => {
       localStorage.removeItem("unsentMessage"); 
       setSessionValid(false);
       isUserRef.current = false;
-      usernameRef.current = "";
       authTokenRef.current = "";
+      idRef.current = "";
+      usernameRef.current = "";
 
       socketRef.current = setupSocket(null);
     }
@@ -180,7 +183,7 @@ export const SessionProvider = ({ children }) => {
             () => checkSession(true),
             remainingTimeoutRef.current - timeAway
           );
-          socketRef.current = setupSocket(isUserRef.current ? { username: usernameRef.current, authToken: authTokenRef.current } : null);
+          socketRef.current = setupSocket(isUserRef.current ? { authToken: authTokenRef.current,  username: usernameRef.current,  } : null);
         }
       }
     } else if (document.visibilityState === "hidden") {
@@ -242,12 +245,12 @@ export const SessionProvider = ({ children }) => {
       sessionValid,
       loading,
       isUser: isUserRef.current,
-      username: usernameRef.current,
       authToken: authTokenRef.current,
+      id: idRef.current,
+      username: usernameRef.current,
       activeUsers,
       activeVisitors,
-      userStatuses, 
-      usernameRef,
+      userStatuses,
       setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }])
     }}>
       {children}

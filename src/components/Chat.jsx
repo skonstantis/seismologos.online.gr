@@ -30,7 +30,7 @@ const ChatBody = () => {
   );
 };
 
-const ChatMessage = ({ sessionValid, setMessage }) => {
+const ChatMessage = ({ sessionValid, setMessage, setNotification, token, id, username }) => {
   const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
@@ -42,11 +42,12 @@ const ChatMessage = ({ sessionValid, setMessage }) => {
   }, [setMessage]);
 
   const sendMessage = async (message) => {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      console.error("No token found");
+    if (!token || !id || !username) {
+      setNotification("Απαγορευμένη Δράση", "red");
       return;
     }
+
+    console.log(token);
 
     try {
       const response = await fetch("https://seismologos.onrender.com/chat/message", {
@@ -54,10 +55,11 @@ const ChatMessage = ({ sessionValid, setMessage }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ token, message }),
+        body: JSON.stringify({ token, id, username, message }),
       });
 
       if (!response.ok) {
+        console.error(response);
         throw new Error("Failed to send message");
       }
 
@@ -107,7 +109,7 @@ const ChatMessage = ({ sessionValid, setMessage }) => {
 };
 
 const Chat = () => {
-  const { sessionValid } = useSession();
+  const { sessionValid, isUser, authToken, id, username, setNotification } = useSession();
 
   if (!JSON.parse(localStorage.getItem("showChat"))) {
     localStorage.setItem("showChat", false);
@@ -141,7 +143,9 @@ const Chat = () => {
           </div>
           <ChatHeader />          
           <ChatBody />
-          <ChatMessage sessionValid={sessionValid} setMessage={setMessage} />
+          { isUser ? 
+          <ChatMessage sessionValid={sessionValid} setMessage={setMessage} setNotification={setNotification} token={authToken} id={id} username={username} /> : 
+          <ChatMessage sessionValid={sessionValid} setMessage={setMessage} token={null} id={null} username={null} />}
           <ChatFooter message={message}/>
         </div>
       )}
