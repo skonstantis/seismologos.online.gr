@@ -61,6 +61,7 @@ const ChatBody = ({ chatMessages }) => {
           <div className={styles.user}>{message.user}</div>
           <div className={styles.time}>{formatElapsedTimeShort(Date.now() - message.time)}</div>
           <div className={styles.message}>{message.message}</div>
+          <div className={styles.id}>{message.id}</div>
         </div>
       ))}
     </div>
