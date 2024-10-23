@@ -26,7 +26,7 @@ export const formatElapsedTime = (elapsedTime) => {
 
 export const formatElapsedTimeShort = (elapsedTime) => {
 
-    if(elapsedTime == 0)
+    if(elapsedTime <= 0)
     {
         return "τώρα";
     }

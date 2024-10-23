@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./chat.module.css";
 import { useSession } from "../contexts/SessionContext";
 import { Link } from "react-router-dom";
+import { formatElapsedTimeShort } from "../js/helpers/elapsedTime";
 
-const chatBufferSize = 50;
+const chatBufferSize = 50; //chars
+const scrollThreshold = 30; //px
+const forceRenderTimeout = 10000; //ms
 
 const ChatFooter = ({ message }) => {
   return (
@@ -23,9 +26,43 @@ const ChatHeader = () => {
   );
 };
 
-const ChatBody = () => {
+const ChatBody = ({ chatMessages }) => {
+  const chatBodyRef = useRef(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [, setForceRender] = useState(0); 
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+        setForceRender(prev => prev + 1); 
+    }, forceRenderTimeout); 
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    if (isAtBottom) {
+      chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
+  const handleScroll = () => {
+    const { scrollTop, scrollHeight, clientHeight } = chatBodyRef.current;
+    setIsAtBottom(scrollTop + clientHeight >= scrollHeight - scrollThreshold);
+  };
+
   return (
-    <div className={styles.chatBody}>
+    <div
+      className={styles.chatBody}
+      onScroll={handleScroll}
+      ref={chatBodyRef}
+    >
+      {chatMessages.map((message, index) => (
+        <div key={index} className={styles.messageWrapper}>
+          <div className={styles.user}>{message.user}</div>
+          <div className={styles.time}>{formatElapsedTimeShort(Date.now() - message.time)}</div>
+          <div className={styles.message}>{message.message}</div>
+        </div>
+      ))}
     </div>
   );
 };
@@ -47,8 +84,6 @@ const ChatMessage = ({ sessionValid, setMessage, setNotification, token, id, use
       return;
     }
 
-    console.log(token);
-
     try {
       const response = await fetch("https://seismologos.onrender.com/chat/message", {
         method: "POST",
@@ -62,9 +97,6 @@ const ChatMessage = ({ sessionValid, setMessage, setNotification, token, id, use
         console.error(response);
         throw new Error("Failed to send message");
       }
-
-      const result = await response.json();
-      console.log("Message sent successfully", result);
       
       localStorage.removeItem("unsentMessage");
       setInputValue("");
@@ -109,7 +141,7 @@ const ChatMessage = ({ sessionValid, setMessage, setNotification, token, id, use
 };
 
 const Chat = () => {
-  const { sessionValid, isUser, authToken, id, username, setNotification } = useSession();
+  const { sessionValid, isUser, authToken, id, username, setNotification, chatMessages } = useSession();
 
   if (!JSON.parse(localStorage.getItem("showChat"))) {
     localStorage.setItem("showChat", false);
@@ -142,7 +174,7 @@ const Chat = () => {
             <img className={styles.chatIcon} src="../assets/chat.svg" alt="Chat" />
           </div>
           <ChatHeader />          
-          <ChatBody />
+          <ChatBody chatMessages={chatMessages}/>
           { isUser ? 
           <ChatMessage sessionValid={sessionValid} setMessage={setMessage} setNotification={setNotification} token={authToken} id={id} username={username} /> : 
           <ChatMessage sessionValid={sessionValid} setMessage={setMessage} token={null} id={null} username={null} />}

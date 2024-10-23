@@ -31,6 +31,9 @@ export const SessionProvider = ({ children }) => {
   const [activeUsers, setActiveUsers] = useState(0);
   const [activeVisitors, setActiveVisitors] = useState(0);
 
+  const [chatMessages, setChatMessages] = useState([]);
+  
+
   const checkSessionTimeout = 30 * 60 * 1000; // 30 minutes
   const checkSessionTimeoutIdRef = useRef(null);
   const startTimeoutRef = useRef(null);
@@ -119,6 +122,10 @@ export const SessionProvider = ({ children }) => {
           };
         }).sort((a, b) => a.elapsedTime - b.elapsedTime); 
         setUserStatuses(updatedUserStatuses); 
+      }
+
+      if (message?.message) {
+        setChatMessages((prevChatMessages) => [...prevChatMessages, message]);
       }
     };
 
@@ -251,6 +258,7 @@ export const SessionProvider = ({ children }) => {
       activeUsers,
       activeVisitors,
       userStatuses,
+      chatMessages,
       setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }])
     }}>
       {children}

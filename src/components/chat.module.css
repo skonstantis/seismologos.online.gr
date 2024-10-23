@@ -43,6 +43,7 @@
 .chatBody {
   background-color: rgb(35, 52, 97);
   height: 200px;
+  overflow: auto;
 }
 
 .chatMessage {
@@ -101,4 +102,24 @@
   position: absolute;
   right: 10px;
   padding: 5px;
+}
+
+.messageWrapper
+{
+  color: white;
+}
+
+.user
+{
+  padding: 3px;
+}
+
+.time
+{
+  padding: 3px;
+}
+
+.message
+{
+  padding: 3px;
 }
