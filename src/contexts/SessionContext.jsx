@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import Notification from "../components/Notification";
-import { formatElapsedTime, formatElapsedTimeShort } from "../js/helpers/elapsedTime";
 import { formatTimestamp } from "../js/helpers/formatTimestamp";
 
 const SessionContext = createContext();
@@ -113,14 +112,12 @@ export const SessionProvider = ({ children }) => {
       }
 
       if (message?.userStatuses) {
-        const updatedUserStatuses = message.userStatuses.map(({ elapsedTime, ...userStatus }) => {
+        const updatedUserStatuses = message.userStatuses.map(({ lastActive, ...userStatus }) => {
           return {
             ...userStatus,
-            elapsedTime,
-            text: formatElapsedTime(elapsedTime),
-            textShort: formatElapsedTimeShort(elapsedTime)
+            lastActive
           };
-        }).sort((a, b) => a.elapsedTime - b.elapsedTime); 
+        }); 
         setUserStatuses(updatedUserStatuses); 
       }
 

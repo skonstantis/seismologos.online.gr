@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "../contexts/SessionContext";
+import { formatElapsedTimeShort } from "../js/helpers/elapsedTime";
 import { formatNumber } from "../js/helpers/formatNumber";
 import styles from "./activeUsers.module.css";
 import SearchBar from "./SearchBar"; 
+
+const forceRenderTimeout = 10000; //ms
 
 const UserItem = ({ status }) => {
   const usernameRef = useRef(null);
@@ -27,13 +30,13 @@ const UserItem = ({ status }) => {
           {status.username}
         </div>
       </div>
-      <div className={styles.textShort}>{status.textShort}</div>
+      <div className={styles.textShort}>{status.lastActive == 0 ? "τώρα" : formatElapsedTimeShort(Date.now() - status.lastActive)}</div>
     </div>
   );
 };
 
 const UsersActive = ({ searchElements }) => {
-  const activeUsers = searchElements?.filter(status => status.textShort === "τώρα").sort((a, b) => a.elapsedTime - b.elapsedTime);
+  const activeUsers = searchElements?.filter(status => status.lastActive === 0);
   return (
     <div className={styles.userListWrapperOuter}>
       <div className={styles.userListWrapperInner}>
@@ -48,7 +51,17 @@ const UsersActive = ({ searchElements }) => {
 };
 
 const UsersRecentlyActive = ({ searchElements }) => {
-  const recentlyActiveUsers = searchElements?.filter(status => status.textShort !== "τώρα");
+  const [, setForceRender] = useState(0); 
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+        setForceRender(prev => prev + 1); 
+    }, forceRenderTimeout); 
+
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  const recentlyActiveUsers = searchElements?.filter(status => status.lastActive !== 0);
   return (
     <div className={styles.userListWrapperOuter}>
       <div className={styles.userListWrapperInner}>
@@ -78,7 +91,7 @@ const ActiveUsersNav = ({ searchElements, selectedList, setSelectedList }) => {
         <div>
           Τώρα
           <br />
-          ({formatNumber(searchElements?.filter(status => status.textShort === "τώρα").length)})
+          ({formatNumber(searchElements?.filter(status => status.lastActive === 0).length)})
         </div>
       </div>
       <div
@@ -93,7 +106,7 @@ const ActiveUsersNav = ({ searchElements, selectedList, setSelectedList }) => {
         <div>
           Πρόσφατα
           <br />
-          ({formatNumber(searchElements?.filter(status => status.textShort !== "τώρα").length)})
+          ({formatNumber(searchElements?.filter(status => status.lastActive !== 0).length)})
         </div>
       </div>
     </div>
@@ -133,8 +146,8 @@ const ActiveUsers = () => {
   }, [userStatuses, searchTerm]);
 
   const isActiveListEmpty = selectedList === "now"
-    ? searchResults.filter(status => status.textShort === "τώρα").length === 0
-    : searchResults.filter(status => status.textShort !== "τώρα").length === 0;
+    ? searchResults.filter(status => status.lastActive === 0).length === 0
+    : searchResults.filter(status => status.lastActive !== 0).length === 0;
 
   return (
     <>
