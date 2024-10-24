@@ -69,7 +69,7 @@
   width: 280px;
   border: 2px solid #ccc;
   border-radius: 10px;
-  font-size: 16px;
+  font-size: 14px;
   margin-bottom: 5px;
 }
 
@@ -125,18 +125,40 @@
 
 .user
 {
+  font-size: 14px;
   padding: 3px;
+  padding-top: 1px;
   user-select: text;
+  float: left;
+  font-weight: bolder;
 }
 
 .time
 {
-  padding: 3px;
+  padding-right: 3px;
+  padding-top: 3px;
+  font-size: 12px;
+  float: right;
+  height: fit-content;
 }
 
 .message
 {
+  text-align: left;
   padding: 3px;
   user-select: text;
   font-size: 14px;
+  font-weight: 100;
+}
+
+.chatInnerHeader
+{
+  height: 20px;
+}
+
+.tick
+{
+  width: 10px;
+  float: right;
+  margin-top: 5px;
 }

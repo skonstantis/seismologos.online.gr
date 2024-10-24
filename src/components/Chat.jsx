@@ -97,14 +97,16 @@ const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
           data-id={message.id}
           ref={(el) => (messageRefs.current[index] = el)}
         >
-          <div className={styles.user}>{message.user}</div>
-          <div className={styles.time}>
-            {formatElapsedTimeShort(Date.now() - message.time)}
+          <div className={styles.chatInnerHeader}>  
+            <div className={styles.user}>{message.user}</div>
+            <div className={styles.time}>
+              {formatElapsedTimeShort(Date.now() - message.time)}
+            </div>
+            {message.id <= lastSeenMessage && (
+              <img className={styles.tick} src="../assets/tick.svg" alt="read" />
+            )}
           </div>
           <div className={styles.message}>{message.message}</div>
-          {message.id === lastSeenMessage && (
-            <div className={styles.id}>{message.id}</div>
-          )}
         </div>
       ))}
     </div>
