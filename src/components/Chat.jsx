@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { formatElapsedTimeShort } from "../js/helpers/elapsedTime";
 
 const chatBufferSize = 50; // chars
-const scrollThreshold = 30; // px
+const scrollThreshold = 5; // px
 const forceRenderTimeout = 10000; // ms
 
 const ChatFooter = ({ message }) => {
@@ -25,10 +25,11 @@ const ChatHeader = () => {
   return <div className={styles.chatHeader}></div>;
 };
 
-const ChatBody = ({ chatMessages, lastMessage, updateLastMessage }) => {
+const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
   const chatBodyRef = useRef(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [, setForceRender] = useState(0);
+  const messageRefs = useRef([]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -40,22 +41,42 @@ const ChatBody = ({ chatMessages, lastMessage, updateLastMessage }) => {
 
   useEffect(() => {
     if (isAtBottom) {
-      chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
+      chatBodyRef.current.scrollTo({
+        top: chatBodyRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
-  }, [chatMessages]);
+  }, [chatMessages, isAtBottom]);
 
   useEffect(() => {
-    let maxId = lastMessage;
-    chatMessages.forEach((message) => {
-      if (message.id > maxId) {
-        maxId = message.id;
-      }
-    });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let maxVisibleId = lastSeenMessage;
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const messageId = parseInt(entry.target.getAttribute('data-id'), 10);
+            if (messageId > maxVisibleId) {
+              maxVisibleId = messageId;
+            }
+          }
+        });
 
-    if (maxId > lastMessage) {
-      updateLastMessage(maxId);
-    }
-  }, [chatMessages, lastMessage, updateLastMessage]);
+        if (maxVisibleId > lastSeenMessage) {
+          updateLastSeenMessage(maxVisibleId);
+        }
+      },
+      {
+        root: chatBodyRef.current,
+        threshold: 1.0, 
+      }
+    );
+
+    messageRefs.current.forEach((ref) => ref && observer.observe(ref));
+
+    return () => {
+      messageRefs.current.forEach((ref) => ref && observer.unobserve(ref));
+    };
+  }, [chatMessages, lastSeenMessage, updateLastSeenMessage]);
 
   const handleScroll = () => {
     const { scrollTop, scrollHeight, clientHeight } = chatBodyRef.current;
@@ -69,7 +90,12 @@ const ChatBody = ({ chatMessages, lastMessage, updateLastMessage }) => {
       ref={chatBodyRef}
     >
       {chatMessages.map((message, index) => (
-        <div key={index} className={styles.messageWrapper}>
+        <div
+          key={index}
+          className={styles.messageWrapper}
+          data-id={message.id}
+          ref={(el) => (messageRefs.current[index] = el)}
+        >
           <div className={styles.user}>{message.user}</div>
           <div className={styles.time}>
             {formatElapsedTimeShort(Date.now() - message.time)}
@@ -160,14 +186,14 @@ const Chat = () => {
 
   const [show, setShow] = useState(() => JSON.parse(localStorage.getItem("showChat")) || false);
   const [message, setMessage] = useState("");
-  const [lastMessage, setLastMessage] = useState(0);
+  const [lastSeenMessage, setlastSeenMessage] = useState(0);
 
   useEffect(() => {
-    const fetchLastMessage = async () => {
-      const savedLastMessage = sessionStorage.getItem("lastMessage");
-      const parsedLastMessage = parseInt(savedLastMessage, 10);
+    const fetchlastSeenMessage = async () => {
+      const savedlastSeenMessage = localStorage.getItem("lastSeenMessage");
+      const parsedlastSeenMessage = parseInt(savedlastSeenMessage, 10);
 
-      if (isNaN(parsedLastMessage) || parsedLastMessage < 0) {
+      if (isNaN(parsedlastSeenMessage) || parsedlastSeenMessage < 0) {
         try {
           const response = await fetch("https://seismologos.onrender.com/chat/last", {
             method: "GET",
@@ -178,24 +204,24 @@ const Chat = () => {
 
           if (!response.ok) {
             console.error('Failed to fetch last message', response);
-            sessionStorage.setItem("lastMessage", "0");
-            setLastMessage(0);
+            localStorage.setItem("lastSeenMessage", "0");
+            setlastSeenMessage(0);
           } else {
             const data = await response.json();
-            sessionStorage.setItem("lastMessage", data);
-            setLastMessage(data);
+            localStorage.setItem("lastSeenMessage", data);
+            setlastSeenMessage(data);
           }
         } catch (error) {
           console.error('Error fetching last message:', error);
-          sessionStorage.setItem("lastMessage", "0");
-          setLastMessage(0);
+          localStorage.setItem("lastSeenMessage", "0");
+          setlastSeenMessage(0);
         }
       } else {
-        setLastMessage(parsedLastMessage);
+        setlastSeenMessage(parsedlastSeenMessage);
       }
     };
 
-    fetchLastMessage();
+    fetchlastSeenMessage();
   }, []);
 
   useEffect(() => {
@@ -208,10 +234,10 @@ const Chat = () => {
     setShow(newShowStatus);
   };
 
-  const updateLastMessage = useCallback((id) => {
+  const updateLastSeenMessage = useCallback((id) => {
     if (id >= 0) {
-      setLastMessage(id);
-      sessionStorage.setItem("lastMessage", id);
+      setlastSeenMessage(id);
+      localStorage.setItem("lastSeenMessage", id);
     }
   }, []);
 
@@ -233,7 +259,7 @@ const Chat = () => {
             <img className={styles.chatIcon} src="../assets/chat.svg" alt="Chat" />
           </div>
           <ChatHeader />
-          <ChatBody chatMessages={chatMessages} lastMessage={lastMessage} updateLastMessage={updateLastMessage} />
+          <ChatBody chatMessages={chatMessages} lastSeenMessage={lastSeenMessage} updateLastSeenMessage={updateLastSeenMessage} />
           {isUser ? (
             <ChatMessage sessionValid={sessionValid} setMessage={setMessage} setNotification={setNotification} token={authToken} id={id} username={username} />
           ) : (
