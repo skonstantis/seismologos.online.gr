@@ -19,7 +19,6 @@
   font-weight: bolder;
   color: white;
   background-color: rgb(18, 31, 65);
-  padding: 7.7px;
   font-size: 16px;
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
@@ -34,21 +33,36 @@
   width: 20px;
   margin-left: 20px;
   padding: 3px;
+  padding-top: 5px;
 }
 
 .chatHeader {
   width: 300px;
 }
 
+.light
+{
+  background-color: rgb(46, 67, 124);
+}
+
+.dark
+{
+  background-color: rgb(38, 56, 104);
+}
+
 .chatBody {
   background-color: rgb(35, 52, 97);
   height: 200px;
   overflow: auto;
+  word-wrap: break-word; 
+  overflow-wrap: break-word;
+  width: 300px;
 }
 
 .chatMessage {
-  background-color: rgb(35, 52, 97);
+  background-color: rgb(18, 31, 65);
   height: fit-content;
+  padding-top: 10px;
 }
 
 .chatInput {
@@ -74,7 +88,7 @@
 }
 
 .chatFooter {
-  background-color: rgb(35, 52, 97);
+  background-color: rgb(18, 31, 65);
   border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
   display: flex;
@@ -112,6 +126,7 @@
 .user
 {
   padding: 3px;
+  user-select: text;
 }
 
 .time
@@ -122,4 +137,6 @@
 .message
 {
   padding: 3px;
+  user-select: text;
+  font-size: 14px;
 }

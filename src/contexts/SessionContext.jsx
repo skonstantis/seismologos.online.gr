@@ -117,7 +117,7 @@ export const SessionProvider = ({ children }) => {
             ...userStatus,
             lastActive
           };
-        }); 
+        }).sort((a, b) => b.lastActive - a.lastActive); 
         setUserStatuses(updatedUserStatuses); 
       }
 

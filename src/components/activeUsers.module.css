@@ -20,7 +20,6 @@
     font-weight: bolder;
     color: white;
     background-color: rgb(18, 31, 65); 
-    padding: 7.7px;
     font-size: 16px;
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
@@ -37,10 +36,11 @@
     width: 25px;
     margin-left: 20px;
     padding: 3px;
+    padding-top: 5px;
 }
 
 .userListWrapperOuter {
-    background-color: rgb(35, 52, 97); 
+  background-color: rgb(18, 31, 65);
     overflow: hidden; 
     color: white;
     border-bottom-right-radius: 10px;
@@ -51,7 +51,6 @@
   .userListWrapperInner {
     max-height: 130px;
     overflow-y: auto; 
-    padding-right: 10px; 
   }
   
 .activeUsersNavContainer {
@@ -72,6 +71,16 @@
     font-weight: bold;
     color: white;
     border-bottom: 2px solid white;
+}
+
+.light
+{
+  background-color: rgb(46, 67, 124);
+}
+
+.dark
+{
+  background-color: rgb(38, 56, 104);
 }
 
 .user {

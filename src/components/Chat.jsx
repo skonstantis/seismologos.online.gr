@@ -4,7 +4,7 @@ import { useSession } from "../contexts/SessionContext";
 import { Link } from "react-router-dom";
 import { formatElapsedTimeShort } from "../js/helpers/elapsedTime";
 
-const chatBufferSize = 50; // chars
+const chatBufferSize = 250; // chars
 const scrollThreshold = 5; // px
 const forceRenderTimeout = 10000; // ms
 
@@ -43,7 +43,7 @@ const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
     if (isAtBottom) {
       chatBodyRef.current.scrollTo({
         top: chatBodyRef.current.scrollHeight,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   }, [chatMessages, isAtBottom]);
@@ -54,7 +54,10 @@ const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
         let maxVisibleId = lastSeenMessage;
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const messageId = parseInt(entry.target.getAttribute('data-id'), 10);
+            const messageId = parseInt(
+              entry.target.getAttribute("data-id"),
+              10
+            );
             if (messageId > maxVisibleId) {
               maxVisibleId = messageId;
             }
@@ -67,7 +70,7 @@ const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
       },
       {
         root: chatBodyRef.current,
-        threshold: 1.0, 
+        threshold: 1.0,
       }
     );
 
@@ -84,15 +87,13 @@ const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
   };
 
   return (
-    <div
-      className={styles.chatBody}
-      onScroll={handleScroll}
-      ref={chatBodyRef}
-    >
+    <div className={styles.chatBody} onScroll={handleScroll} ref={chatBodyRef}>
       {chatMessages.map((message, index) => (
         <div
           key={index}
-          className={styles.messageWrapper}
+          className={`${styles.messageWrapper} ${
+            message.id % 2 === 0 ? styles.light : styles.dark
+          }`}
           data-id={message.id}
           ref={(el) => (messageRefs.current[index] = el)}
         >
@@ -101,14 +102,23 @@ const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
             {formatElapsedTimeShort(Date.now() - message.time)}
           </div>
           <div className={styles.message}>{message.message}</div>
-          <div className={styles.id}>{message.id}</div>
+          {message.id === lastSeenMessage && (
+            <div className={styles.id}>{message.id}</div>
+          )}
         </div>
       ))}
     </div>
   );
 };
 
-const ChatMessage = ({ sessionValid, setMessage, setNotification, token, id, username }) => {
+const ChatMessage = ({
+  sessionValid,
+  setMessage,
+  setNotification,
+  token,
+  id,
+  username,
+}) => {
   const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
@@ -126,13 +136,16 @@ const ChatMessage = ({ sessionValid, setMessage, setNotification, token, id, use
     }
 
     try {
-      const response = await fetch("https://seismologos.onrender.com/chat/message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token, id, username, message }),
-      });
+      const response = await fetch(
+        "https://seismologos.onrender.com/chat/message",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token, id, username, message }),
+        }
+      );
 
       if (!response.ok) {
         console.error(response);
@@ -162,6 +175,21 @@ const ChatMessage = ({ sessionValid, setMessage, setNotification, token, id, use
     }
   };
 
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData('text'); 
+    const newValue = inputValue + pastedText; 
+    if (newValue.length > chatBufferSize) {
+      setInputValue(newValue.slice(0, chatBufferSize));
+      setMessage(newValue.slice(0, chatBufferSize));
+      localStorage.setItem("unsentMessage", newValue.slice(0, chatBufferSize));
+    } else {
+      setInputValue(newValue);
+      setMessage(newValue);
+      localStorage.setItem("unsentMessage", newValue);
+    }
+  };
+
   return (
     <div className={styles.chatMessage}>
       <input
@@ -171,9 +199,12 @@ const ChatMessage = ({ sessionValid, setMessage, setNotification, token, id, use
             ? "Πληκτρολογήστε το μήνυμα σας εδώ"
             : "Λειτουργία μόνο για Χρήστες"
         }
-        className={`${styles.chatInput} ${inputValue.length >= chatBufferSize ? styles.error : ""}`}
+        className={`${styles.chatInput} ${
+          inputValue.length >= chatBufferSize ? styles.error : ""
+        }`}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onPaste={handlePaste} 
         value={inputValue}
         disabled={!sessionValid}
       />
@@ -182,9 +213,19 @@ const ChatMessage = ({ sessionValid, setMessage, setNotification, token, id, use
 };
 
 const Chat = () => {
-  const { sessionValid, isUser, authToken, id, username, setNotification, chatMessages } = useSession();
+  const {
+    sessionValid,
+    isUser,
+    authToken,
+    id,
+    username,
+    setNotification,
+    chatMessages,
+  } = useSession();
 
-  const [show, setShow] = useState(() => JSON.parse(localStorage.getItem("showChat")) || false);
+  const [show, setShow] = useState(
+    () => JSON.parse(localStorage.getItem("showChat")) || false
+  );
   const [message, setMessage] = useState("");
   const [lastSeenMessage, setlastSeenMessage] = useState(0);
 
@@ -195,15 +236,18 @@ const Chat = () => {
 
       if (isNaN(parsedlastSeenMessage) || parsedlastSeenMessage < 0) {
         try {
-          const response = await fetch("https://seismologos.onrender.com/chat/last", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+          const response = await fetch(
+            "https://seismologos.onrender.com/chat/last",
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
 
           if (!response.ok) {
-            console.error('Failed to fetch last message', response);
+            console.error("Failed to fetch last message", response);
             localStorage.setItem("lastSeenMessage", "0");
             setlastSeenMessage(0);
           } else {
@@ -212,7 +256,7 @@ const Chat = () => {
             setlastSeenMessage(data);
           }
         } catch (error) {
-          console.error('Error fetching last message:', error);
+          console.error("Error fetching last message:", error);
           localStorage.setItem("lastSeenMessage", "0");
           setlastSeenMessage(0);
         }
@@ -251,19 +295,44 @@ const Chat = () => {
       />
       {!show ? (
         <div className={styles.headingClosed}>
-          <img className={styles.chatIcon} src="../assets/chat.svg" alt="Chat" />
+          <img
+            className={styles.chatIcon}
+            src="../assets/chat.svg"
+            alt="Chat"
+          />
         </div>
       ) : (
         <div>
           <div className={styles.heading}>
-            <img className={styles.chatIcon} src="../assets/chat.svg" alt="Chat" />
+            <img
+              className={styles.chatIcon}
+              src="../assets/chat.svg"
+              alt="Chat"
+            />
           </div>
           <ChatHeader />
-          <ChatBody chatMessages={chatMessages} lastSeenMessage={lastSeenMessage} updateLastSeenMessage={updateLastSeenMessage} />
+          <ChatBody
+            chatMessages={chatMessages}
+            lastSeenMessage={lastSeenMessage}
+            updateLastSeenMessage={updateLastSeenMessage}
+          />
           {isUser ? (
-            <ChatMessage sessionValid={sessionValid} setMessage={setMessage} setNotification={setNotification} token={authToken} id={id} username={username} />
+            <ChatMessage
+              sessionValid={sessionValid}
+              setMessage={setMessage}
+              setNotification={setNotification}
+              token={authToken}
+              id={id}
+              username={username}
+            />
           ) : (
-            <ChatMessage sessionValid={sessionValid} setMessage={setMessage} token={null} id={null} username={null} />
+            <ChatMessage
+              sessionValid={sessionValid}
+              setMessage={setMessage}
+              token={null}
+              id={null}
+              username={null}
+            />
           )}
           <ChatFooter message={message} />
         </div>

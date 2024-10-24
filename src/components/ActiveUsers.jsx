@@ -7,7 +7,7 @@ import SearchBar from "./SearchBar";
 
 const forceRenderTimeout = 10000; //ms
 
-const UserItem = ({ status }) => {
+const UserItem = ({ status, color }) => {
   const usernameRef = useRef(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
 
@@ -24,7 +24,9 @@ const UserItem = ({ status }) => {
   }, [status.username]);
 
   return (
-    <div className={styles.user}>
+    <div className={`${styles.user} ${
+      color === "light" ? styles.light : styles.dark
+    }`}>
       <div className={styles.username} ref={usernameRef}>
         <div className={isOverflowing ? styles.usernameScroll : ""}>
           {status.username}
@@ -37,12 +39,13 @@ const UserItem = ({ status }) => {
 
 const UsersActive = ({ searchElements }) => {
   const activeUsers = searchElements?.filter(status => status.lastActive === 0);
+  let i = 0;
   return (
     <div className={styles.userListWrapperOuter}>
       <div className={styles.userListWrapperInner}>
         {activeUsers && activeUsers.length > 0 && (
           activeUsers.map((status, index) => (
-            <UserItem key={index} status={status} />
+            <UserItem key={index} status={status} color={i++ % 2 == 0 ? "light" : "dark"}/>
           ))
         )}
       </div>
@@ -62,12 +65,13 @@ const UsersRecentlyActive = ({ searchElements }) => {
   }, []);
   
   const recentlyActiveUsers = searchElements?.filter(status => status.lastActive !== 0);
+  let i = 0;
   return (
     <div className={styles.userListWrapperOuter}>
       <div className={styles.userListWrapperInner}>
         {recentlyActiveUsers && recentlyActiveUsers.length > 0 && (
           recentlyActiveUsers.map((status, index) => (
-            <UserItem key={index} status={status} />
+            <UserItem key={index} status={status} color={i++ % 2 == 0 ? "light" : "dark"}/>
           ))
         )}
       </div>
