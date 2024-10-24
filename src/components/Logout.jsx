@@ -37,6 +37,7 @@ const Logout = () => {
       setIsLoading(true);
       const token = localStorage.getItem("authToken");
       const id = localStorage.getItem("id");
+      const username = localStorage.getItem("username");
 
       try {
         const response = await fetch(
@@ -46,7 +47,7 @@ const Logout = () => {
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ token, id }),
+              body: JSON.stringify({ token, username, id }),
             }
         );
 
