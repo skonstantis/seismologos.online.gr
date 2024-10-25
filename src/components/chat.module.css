@@ -51,6 +51,7 @@
 }
 
 .chatBody {
+  position: relative;
   background-color: rgb(35, 52, 97);
   height: 200px;
   overflow: auto;
@@ -161,4 +162,25 @@
   width: 10px;
   float: right;
   margin-top: 5px;
+}
+
+.arrow
+{
+  width: 8px;
+  margin-left: 3px;
+}
+
+.unseen
+{
+  margin-top: 3px;
+  position: fixed;
+  left: 170px;
+  transform: translateX(-50%);
+  font-weight: bolder;
+  padding: 2px 7px;
+  background-color: rgb(18, 31, 65);
+  border: 2px solid white;
+  border-radius: 100px;
+  color: white;
+  font-size: 14px;
 }

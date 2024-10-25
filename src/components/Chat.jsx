@@ -25,11 +25,25 @@ const ChatHeader = () => {
   return <div className={styles.chatHeader}></div>;
 };
 
-const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
+const ChatBody = ({
+  chatMessages,
+  lastSeenMessage,
+  currentMessage,
+  unseenMessages,
+  setCurrentMessage,
+  updateLastSeenMessage,
+  setUnseenMessages,
+}) => {
   const chatBodyRef = useRef(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [, setForceRender] = useState(0);
   const messageRefs = useRef([]);
+
+  useEffect(() => {
+    chatMessages.length > 0
+      ? setCurrentMessage(chatMessages[chatMessages.length - 1].id)
+      : "";
+  }, [chatMessages]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -86,8 +100,29 @@ const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
     setIsAtBottom(scrollTop + clientHeight >= scrollHeight - scrollThreshold);
   };
 
+  const handleUnseenMessagesClick = () => {
+    chatBodyRef.current.scrollTo({
+      top: chatBodyRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+    setUnseenMessages(0);
+  };
+
   return (
     <div className={styles.chatBody} onScroll={handleScroll} ref={chatBodyRef}>
+      {unseenMessages > 0 ? (
+        <div className={styles.unseen} onClick={handleUnseenMessagesClick}>
+          {unseenMessages}
+          <img
+            className={styles.arrow}
+            src="../assets/arrow.svg"
+            alt="go to bottom"
+          />
+        </div>
+        
+      ) : (
+        ""
+      )}
       {chatMessages.map((message, index) => (
         <div
           key={index}
@@ -97,13 +132,17 @@ const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
           data-id={message.id}
           ref={(el) => (messageRefs.current[index] = el)}
         >
-          <div className={styles.chatInnerHeader}>  
+          <div className={styles.chatInnerHeader}>
             <div className={styles.user}>{message.user}</div>
             <div className={styles.time}>
               {formatElapsedTimeShort(Date.now() - message.time)}
             </div>
             {message.id <= lastSeenMessage && (
-              <img className={styles.tick} src="../assets/tick.svg" alt="read" />
+              <img
+                className={styles.tick}
+                src="../assets/tick.svg"
+                alt="read"
+              />
             )}
           </div>
           <div className={styles.message}>{message.message}</div>
@@ -112,6 +151,7 @@ const ChatBody = ({ chatMessages, lastSeenMessage, updateLastSeenMessage }) => {
     </div>
   );
 };
+
 
 const ChatMessage = ({
   sessionValid,
@@ -122,6 +162,7 @@ const ChatMessage = ({
   username,
 }) => {
   const [inputValue, setInputValue] = useState("");
+  const [sending, setSending] = useState(false); 
 
   useEffect(() => {
     const savedMessage = localStorage.getItem("unsentMessage");
@@ -136,6 +177,8 @@ const ChatMessage = ({
       setNotification("Απαγορευμένη Δράση", "red");
       return;
     }
+
+    setSending(true); 
 
     try {
       const response = await fetch(
@@ -159,11 +202,13 @@ const ChatMessage = ({
       setMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
+    } finally {
+      setSending(false);  
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && inputValue.trim()) {
+    if (e.key === "Enter" && inputValue.trim() && !sending) {
       sendMessage(inputValue);
     }
   };
@@ -179,8 +224,8 @@ const ChatMessage = ({
 
   const handlePaste = (e) => {
     e.preventDefault();
-    const pastedText = e.clipboardData.getData('text'); 
-    const newValue = inputValue + pastedText; 
+    const pastedText = e.clipboardData.getData("text");
+    const newValue = inputValue + pastedText;
     if (newValue.length > chatBufferSize) {
       setInputValue(newValue.slice(0, chatBufferSize));
       setMessage(newValue.slice(0, chatBufferSize));
@@ -206,7 +251,7 @@ const ChatMessage = ({
         }`}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        onPaste={handlePaste} 
+        onPaste={handlePaste}
         value={inputValue}
         disabled={!sessionValid}
       />
@@ -229,10 +274,45 @@ const Chat = () => {
     () => JSON.parse(localStorage.getItem("showChat")) || false
   );
   const [message, setMessage] = useState("");
-  const [lastSeenMessage, setlastSeenMessage] = useState(0);
+  const [lastSeenMessage, setLastSeenMessage] = useState(0);
+  const [unseenMessages, setUnseenMessages] = useState(0);
+  const [currentMessage, setCurrentMessage] = useState(0);
 
   useEffect(() => {
-    const fetchlastSeenMessage = async () => {
+    setUnseenMessages(currentMessage - lastSeenMessage);
+  }, [currentMessage, lastSeenMessage]);
+
+  useEffect(() => {
+    const fetchLastMessage = async () => {
+      try {
+        const response = await fetch(
+          "https://seismologos.onrender.com/chat/last",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          console.error("Failed to fetch last message", response);
+          setCurrentMessage(0);
+        } else {
+          const data = await response.json();
+          setCurrentMessage(data);
+        }
+      } catch (error) {
+        console.error("Error fetching last message:", error);
+        setCurrentMessage(0);
+      }
+    };
+
+    fetchLastMessage();
+  }, []);
+
+  useEffect(() => {
+    const fetchLastSeenMessage = async () => {
       const savedlastSeenMessage = localStorage.getItem("lastSeenMessage");
       const parsedlastSeenMessage = parseInt(savedlastSeenMessage, 10);
 
@@ -251,23 +331,23 @@ const Chat = () => {
           if (!response.ok) {
             console.error("Failed to fetch last message", response);
             localStorage.setItem("lastSeenMessage", "0");
-            setlastSeenMessage(0);
+            setLastSeenMessage(0);
           } else {
             const data = await response.json();
             localStorage.setItem("lastSeenMessage", data);
-            setlastSeenMessage(data);
+            setLastSeenMessage(data);
           }
         } catch (error) {
           console.error("Error fetching last message:", error);
           localStorage.setItem("lastSeenMessage", "0");
-          setlastSeenMessage(0);
+          setLastSeenMessage(0);
         }
       } else {
-        setlastSeenMessage(parsedlastSeenMessage);
+        setLastSeenMessage(parsedlastSeenMessage);
       }
     };
 
-    fetchlastSeenMessage();
+    fetchLastSeenMessage();
   }, []);
 
   useEffect(() => {
@@ -282,7 +362,7 @@ const Chat = () => {
 
   const updateLastSeenMessage = useCallback((id) => {
     if (id >= 0) {
-      setlastSeenMessage(id);
+      setLastSeenMessage(id);
       localStorage.setItem("lastSeenMessage", id);
     }
   }, []);
@@ -316,7 +396,11 @@ const Chat = () => {
           <ChatBody
             chatMessages={chatMessages}
             lastSeenMessage={lastSeenMessage}
+            currentMessage={currentMessage}
+            unseenMessages={unseenMessages}
+            setCurrentMessage={setCurrentMessage}
             updateLastSeenMessage={updateLastSeenMessage}
+            setUnseenMessages={setUnseenMessages}
           />
           {isUser ? (
             <ChatMessage
