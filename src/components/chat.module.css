@@ -75,7 +75,7 @@
 }
 
 .chatInput::placeholder {
-  font-size: 14px;
+  font-size: 12px;
   color: #999;
 }
 
@@ -129,6 +129,7 @@
   font-size: 14px;
   padding: 3px;
   padding-top: 1px;
+  padding-left: 5px;
   user-select: text;
   float: left;
   font-weight: bolder;
@@ -150,6 +151,8 @@
   user-select: text;
   font-size: 14px;
   font-weight: 100;
+  
+  padding-left: 5px;
 }
 
 .chatInnerHeader

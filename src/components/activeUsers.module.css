@@ -54,6 +54,7 @@
   }
   
 .activeUsersNavContainer {
+    font-size: 14px;
     display: flex;
     justify-content: space-between;
 }
@@ -95,11 +96,15 @@
     width: 240px;
     overflow: hidden; 
     text-align: center;
+    font-weight: bold;
+    font-size: 14px;
 }
 
 .textShort {
     width: 40px;
     text-align: center;
+    font-weight: bold;
+    font-size: 14px;
 }
 
 .usernameScroll {

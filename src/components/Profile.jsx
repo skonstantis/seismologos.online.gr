@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import styles from "./profile.module.css";
 import { useSession } from "../contexts/SessionContext";
 
-const ProfileHeader = ({ usernameRef }) => (
+const ProfileHeader = ({ username }) => (
   <div className={styles.profileHeader}>
     <div className={styles.username}>
-      {usernameRef.current}
+      {username}
     </div>
   </div>
 );
@@ -16,7 +16,7 @@ const Profile = () => {
     document.title = "Το Προφίλ Μου";
   }, []);
 
-  const { sessionValid, setNotification, usernameRef } = useSession();
+  const { sessionValid, setNotification, username } = useSession();
   const navigate = useNavigate();  
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const Profile = () => {
   if (!sessionValid) return null; 
 
   return (
-    <ProfileHeader usernameRef = {usernameRef}/>
+    <ProfileHeader username = {username}/>
   );
 };
 
