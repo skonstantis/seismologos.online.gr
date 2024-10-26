@@ -12,6 +12,7 @@
     position: relative;
     margin-top: 20px;
     width: fit-content;
+    z-index: 11;
 }
 
 .heading,
@@ -101,7 +102,7 @@
 }
 
 .textShort {
-    width: 40px;
+    width: 54px;
     text-align: center;
     font-weight: bold;
     font-size: 14px;

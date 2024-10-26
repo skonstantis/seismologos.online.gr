@@ -12,6 +12,7 @@
   margin-top: 20px;
   width: fit-content;
   bottom: 40px;
+  z-index: 0;
 }
 
 .heading,
@@ -53,11 +54,13 @@
 .chatBody {
   position: relative;
   background-color: rgb(35, 52, 97);
-  height: 200px;
   overflow: auto;
   word-wrap: break-word; 
   overflow-wrap: break-word;
   width: 300px;
+  resize: vertical;
+  min-height: 200px;
+  max-height: 72vh;
 }
 
 .chatMessage {

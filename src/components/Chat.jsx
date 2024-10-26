@@ -28,11 +28,15 @@ const ChatHeader = () => {
 const ChatBody = ({
   chatMessages,
   lastSeenMessage,
+  currentlySeeingMessage,
   currentMessage,
   unseenMessages,
   setCurrentMessage,
   updateLastSeenMessage,
+  updateCurrentlySeeingMessage,
   setUnseenMessages,
+  chatHeight,
+  onResize,
 }) => {
   const chatBodyRef = useRef(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
@@ -95,6 +99,56 @@ const ChatBody = ({
     };
   }, [chatMessages, lastSeenMessage, updateLastSeenMessage]);
 
+  useEffect(() => {
+    const observer = new ResizeObserver(() => {
+      const newHeight = chatBodyRef.current.offsetHeight;
+      onResize(newHeight); // Trigger resize callback
+    });
+
+    if (chatBodyRef.current) {
+      observer.observe(chatBodyRef.current);
+    }
+
+    return () => {
+      if (chatBodyRef.current) {
+        observer.unobserve(chatBodyRef.current);
+      }
+    };
+  }, [onResize]);
+
+  useEffect(() => {
+    const currentlySeeingObserver = new IntersectionObserver(
+      (entries) => {
+        let closestToCenter = null;
+        let closestDistance = Infinity;
+
+        entries.forEach((entry) => {
+          const messageId = parseInt(entry.target.getAttribute("data-id"), 10);
+          const distanceToCenter = Math.abs(entry.boundingClientRect.top + entry.boundingClientRect.height / 2 - window.innerHeight / 2);
+
+          if (distanceToCenter < closestDistance) {
+            closestDistance = distanceToCenter;
+            closestToCenter = messageId;
+          }
+        });
+
+        if (closestToCenter && closestToCenter !== currentlySeeingMessage) {
+          updateCurrentlySeeingMessage(closestToCenter);
+        }
+      },
+      {
+        root: chatBodyRef.current,
+        threshold: 0.5,
+      }
+    );
+
+    messageRefs.current.forEach((ref) => ref && currentlySeeingObserver.observe(ref));
+
+    return () => {
+      messageRefs.current.forEach((ref) => ref && currentlySeeingObserver.unobserve(ref));
+    };
+  }, [chatMessages, currentlySeeingMessage, updateCurrentlySeeingMessage]);
+
   const handleScroll = () => {
     const { scrollTop, scrollHeight, clientHeight } = chatBodyRef.current;
     setIsAtBottom(scrollTop + clientHeight >= scrollHeight - scrollThreshold);
@@ -109,7 +163,7 @@ const ChatBody = ({
   };
 
   return (
-    <div className={styles.chatBody} onScroll={handleScroll} ref={chatBodyRef}>
+    <div style={{ height: `${chatHeight}px`}} className={styles.chatBody} onScroll={handleScroll} ref={chatBodyRef}>
       {unseenMessages > 0 ? (
         <div className={styles.unseen} onClick={handleUnseenMessagesClick}>
           {unseenMessages}
@@ -119,7 +173,6 @@ const ChatBody = ({
             alt="go to bottom"
           />
         </div>
-        
       ) : (
         ""
       )}
@@ -275,8 +328,12 @@ const Chat = () => {
   );
   const [message, setMessage] = useState("");
   const [lastSeenMessage, setLastSeenMessage] = useState(0);
+  const [currentlySeeingMessage, setCurrentlySeeingMessage] = useState(0);
   const [unseenMessages, setUnseenMessages] = useState(0);
   const [currentMessage, setCurrentMessage] = useState(0);
+  const [chatHeight, setChatHeight] = useState(
+    () => JSON.parse(localStorage.getItem("chatHeight")) || 200
+  );
 
   useEffect(() => {
     setUnseenMessages(currentMessage - lastSeenMessage);
@@ -351,8 +408,51 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
+    const fetchCurrentlySeeingMessage = async () => {
+      const savedCurrentlySeeingMessage = localStorage.getItem("currentlySeeingMessage");
+      const parsedCurrentlySeeingMessage = parseInt(savedCurrentlySeeingMessage, 10);
+
+      if (isNaN(parsedCurrentlySeeingMessage) || parsedCurrentlySeeingMessage < 0) {
+        try {
+          const response = await fetch(
+            "https://seismologos.onrender.com/chat/last",
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            console.error("Failed to fetch last message", response);
+            localStorage.setItem("currentlySeeingMessage", "0");
+            setCurrentlySeeingMessage(0);
+          } else {
+            const data = await response.json();
+            localStorage.setItem("currentlySeeingMessage", data);
+            setCurrentlySeeingMessage(data);
+          }
+        } catch (error) {
+          console.error("Error fetching last message:", error);
+          localStorage.setItem("currentlySeeingMessage", "0");
+          setCurrentlySeeingMessage(0);
+        }
+      } else {
+        setCurrentlySeeingMessage(parsedCurrentlySeeingMessage);
+      }
+    };
+
+    fetchCurrentlySeeingMessage();
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem("showChat", JSON.stringify(show));
   }, [show]);
+
+  useEffect(() => {
+    localStorage.setItem("chatHeight", JSON.stringify(chatHeight));
+  }, [chatHeight]);
 
   const handleToggleShow = () => {
     const newShowStatus = !show;
@@ -360,10 +460,21 @@ const Chat = () => {
     setShow(newShowStatus);
   };
 
+  const handleResize = (newHeight) => {
+    setChatHeight(newHeight);
+  };
+
   const updateLastSeenMessage = useCallback((id) => {
-    if (id >= 0) {
+    if (id >= 0 && lastSeenMessage != id) {
       setLastSeenMessage(id);
       localStorage.setItem("lastSeenMessage", id);
+    }
+  }, []);
+
+  const updateCurrentlySeeingMessage = useCallback((id) => {
+    if (id >= 0 && currentlySeeingMessage != id) {
+      setCurrentlySeeingMessage(id);
+      localStorage.setItem("currentlySeeingMessage", id);
     }
   }, []);
 
@@ -396,11 +507,15 @@ const Chat = () => {
           <ChatBody
             chatMessages={chatMessages}
             lastSeenMessage={lastSeenMessage}
+            currentlySeeingMessage={currentlySeeingMessage}
             currentMessage={currentMessage}
             unseenMessages={unseenMessages}
             setCurrentMessage={setCurrentMessage}
             updateLastSeenMessage={updateLastSeenMessage}
+            updateCurrentlySeeingMessage={updateCurrentlySeeingMessage}
             setUnseenMessages={setUnseenMessages}
+            chatHeight={chatHeight}
+            onResize={handleResize}
           />
           {isUser ? (
             <ChatMessage
