@@ -60,7 +60,7 @@
   width: 300px;
   resize: vertical;
   min-height: 200px;
-  max-height: 72vh;
+  max-height: 60vh;
 }
 
 .chatMessage {
