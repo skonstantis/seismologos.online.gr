@@ -3,6 +3,7 @@ import styles from "./chat.module.css";
 import { useSession } from "../contexts/SessionContext";
 import { Link } from "react-router-dom";
 import { formatElapsedTimeShort } from "../js/helpers/elapsedTime";
+import { fetchLastMessageId } from "../js/helpers/fetchLastMessageId";
 
 const chatBufferSize = 250; // chars
 const scrollThreshold = 5; // px
@@ -292,9 +293,9 @@ const ChatBody = ({
           ref={(el) => (messageRefs.current[index] = el)}
         >
           <div className={styles.chatInnerHeader}>
-            <div className={styles.user}>{message.user}</div>
+            <div className={styles.user}>{message.username}</div>
             <div className={styles.time}>
-              {formatElapsedTimeShort(Date.now() - message.time)}
+              {formatElapsedTimeShort(Date.now() - message.created)}
             </div>
             {message.id <= lastSeenMessage && (
               <img
@@ -328,45 +329,40 @@ const Chat = () => {
   });
 
   const [message, setMessage] = useState("");
-  const [lastSeenMessage, setLastSeenMessage] = useState(0);
-  const [currentlySeeingMessage, setCurrentlySeeingMessage] = useState(0);
-  const [unseenMessages, setUnseenMessages] = useState(0);
-  const [currentMessage, setCurrentMessage] = useState(0);
+  const [lastSeenMessage, setLastSeenMessage] = useState(null);
+  const [currentlySeeingMessage, setCurrentlySeeingMessage] = useState(null);
+  const [unseenMessages, setUnseenMessages] = useState(null);
+  const [currentMessage, setCurrentMessage] = useState(null);
   const [chatHeight, setChatHeight] = useState(
     () => JSON.parse(localStorage.getItem("chatHeight")) || 200
   );
 
   useEffect(() => {
-    setUnseenMessages(currentMessage - lastSeenMessage);
+    if(lastSeenMessage !== null && currentMessage != null)
+    {
+      setUnseenMessages(currentMessage - lastSeenMessage);
+    }
   }, [currentMessage, lastSeenMessage]);
 
   useEffect(() => {
-    const fetchLastMessage = async () => {
+    const fetchCurrentMessage = async () => {
       try {
-        const response = await fetch(
-          "https://seismologos.onrender.com/chat/last",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetchLastMessageId();
 
         if (!response.ok) {
           console.error("Failed to fetch last message", response);
-          setCurrentMessage(0);
+          setCurrentMessage(null);
         } else {
           const data = await response.json();
           setCurrentMessage(data);
         }
       } catch (error) {
         console.error("Error fetching last message:", error);
-        setCurrentMessage(0);
+        setCurrentMessage(null);
       }
     };
 
-    fetchLastMessage();
+    fetchCurrentMessage();
   }, []);
 
   useEffect(() => {
@@ -374,22 +370,14 @@ const Chat = () => {
       const savedlastSeenMessage = localStorage.getItem("lastSeenMessage");
       const parsedlastSeenMessage = parseInt(savedlastSeenMessage, 10);
 
-      if (isNaN(parsedlastSeenMessage) || parsedlastSeenMessage < 0) {
+      if (isNaN(parsedlastSeenMessage) || parsedlastSeenMessage < 1) {
         try {
-          const response = await fetch(
-            "https://seismologos.onrender.com/chat/last",
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          const response = fetchLastMessageId();
 
           if (!response.ok) {
             console.error("Failed to fetch last message", response);
-            localStorage.setItem("lastSeenMessage", "0");
-            setLastSeenMessage(0);
+            localStorage.setItem("lastSeenMessage", null);
+            setLastSeenMessage(null);
           } else {
             const data = await response.json();
             localStorage.setItem("lastSeenMessage", data);
@@ -397,8 +385,8 @@ const Chat = () => {
           }
         } catch (error) {
           console.error("Error fetching last message:", error);
-          localStorage.setItem("lastSeenMessage", "0");
-          setLastSeenMessage(0);
+          localStorage.setItem("lastSeenMessage", null);
+          setLastSeenMessage(null);
         }
       } else {
         setLastSeenMessage(parsedlastSeenMessage);
@@ -413,22 +401,14 @@ const Chat = () => {
       const savedCurrentlySeeingMessage = localStorage.getItem("currentlySeeingMessage");
       const parsedCurrentlySeeingMessage = parseInt(savedCurrentlySeeingMessage, 10);
 
-      if (isNaN(parsedCurrentlySeeingMessage) || parsedCurrentlySeeingMessage < 0) {
+      if (isNaN(parsedCurrentlySeeingMessage) || parsedCurrentlySeeingMessage < 1) {
         try {
-          const response = await fetch(
-            "https://seismologos.onrender.com/chat/last",
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          const response = fetchLastMessageId();
 
           if (!response.ok) {
             console.error("Failed to fetch last message", response);
-            localStorage.setItem("currentlySeeingMessage", "0");
-            setCurrentlySeeingMessage(0);
+            localStorage.setItem("currentlySeeingMessage", null);
+            setCurrentlySeeingMessage(null);
           } else {
             const data = await response.json();
             localStorage.setItem("currentlySeeingMessage", data);
@@ -436,8 +416,8 @@ const Chat = () => {
           }
         } catch (error) {
           console.error("Error fetching last message:", error);
-          localStorage.setItem("currentlySeeingMessage", "0");
-          setCurrentlySeeingMessage(0);
+          localStorage.setItem("currentlySeeingMessage", null);
+          setCurrentlySeeingMessage(null);
         }
       } else {
         setCurrentlySeeingMessage(parsedCurrentlySeeingMessage);
@@ -466,14 +446,14 @@ const Chat = () => {
   };
 
   const updateLastSeenMessage = useCallback((id) => {
-    if (id >= 0 && lastSeenMessage != id) {
+    if (id > 0 && lastSeenMessage !== id) {
       setLastSeenMessage(id);
       localStorage.setItem("lastSeenMessage", id);
     }
   }, []);
 
   const updateCurrentlySeeingMessage = useCallback((id) => {
-    if (id >= 0 && currentlySeeingMessage != id) {
+    if (id > 0 && currentlySeeingMessage !== id) {
       setCurrentlySeeingMessage(id);
       localStorage.setItem("currentlySeeingMessage", id);
     }

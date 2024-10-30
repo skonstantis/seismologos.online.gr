@@ -31,7 +31,6 @@ export const SessionProvider = ({ children }) => {
   const [activeVisitors, setActiveVisitors] = useState(0);
 
   const [chatMessages, setChatMessages] = useState([]);
-  
 
   const checkSessionTimeout = 30 * 60 * 1000; // 30 minutes
   const checkSessionTimeoutIdRef = useRef(null);
