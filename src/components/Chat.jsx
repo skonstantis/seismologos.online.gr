@@ -25,6 +25,112 @@ const ChatHeader = () => {
   return <div className={styles.chatHeader}></div>;
 };
 
+const ChatMessage = ({
+  sessionValid,
+  setMessage,
+  setNotification,
+  token,
+  id,
+  username,
+}) => {
+  const [inputValue, setInputValue] = useState("");
+  const [sending, setSending] = useState(false); 
+
+  useEffect(() => {
+    const savedMessage = localStorage.getItem("unsentMessage");
+    if (savedMessage) {
+      setInputValue(savedMessage);
+      setMessage(savedMessage);
+    }
+  }, [setMessage]);
+
+  const sendMessage = async (message) => {
+    if (!token || !id || !username) {
+      setNotification("Απαγορευμένη Δράση", "red");
+      return;
+    }
+
+    setSending(true);  
+
+    try {
+      const response = await fetch(
+        "https://seismologos.onrender.com/chat/message",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token, id, username, message }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error(response);
+        throw new Error("Failed to send message");
+      }
+
+      localStorage.removeItem("unsentMessage");
+      setInputValue("");
+      setMessage("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      setSending(false); 
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && inputValue.trim() && !sending) {
+      sendMessage(inputValue);
+    }
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= chatBufferSize) {
+      setInputValue(value);
+      setMessage(value);
+      localStorage.setItem("unsentMessage", value);
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData("text");
+    const newValue = inputValue + pastedText;
+    if (newValue.length > chatBufferSize) {
+      setInputValue(newValue.slice(0, chatBufferSize));
+      setMessage(newValue.slice(0, chatBufferSize));
+      localStorage.setItem("unsentMessage", newValue.slice(0, chatBufferSize));
+    } else {
+      setInputValue(newValue);
+      setMessage(newValue);
+      localStorage.setItem("unsentMessage", newValue);
+    }
+  };
+
+  return (
+    <div className={styles.chatMessage}>
+      <input
+        type="text"
+        placeholder={
+          sessionValid
+            ? "Πληκτρολογήστε το μήνυμα σας εδώ"
+            : "Λειτουργία μόνο για Χρήστες"
+        }
+        className={`${styles.chatInput} ${
+          inputValue.length >= chatBufferSize ? styles.error : ""
+        }`}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
+        value={inputValue}
+        disabled={!sessionValid || sending} 
+      />
+    </div>
+  );
+};
+
 const ChatBody = ({
   chatMessages,
   lastSeenMessage,
@@ -102,7 +208,7 @@ const ChatBody = ({
   useEffect(() => {
     const observer = new ResizeObserver(() => {
       const newHeight = chatBodyRef.current.offsetHeight;
-      onResize(newHeight); // Trigger resize callback
+      onResize(newHeight); 
     });
 
     if (chatBodyRef.current) {
@@ -205,113 +311,6 @@ const ChatBody = ({
   );
 };
 
-
-const ChatMessage = ({
-  sessionValid,
-  setMessage,
-  setNotification,
-  token,
-  id,
-  username,
-}) => {
-  const [inputValue, setInputValue] = useState("");
-  const [sending, setSending] = useState(false); 
-
-  useEffect(() => {
-    const savedMessage = localStorage.getItem("unsentMessage");
-    if (savedMessage) {
-      setInputValue(savedMessage);
-      setMessage(savedMessage);
-    }
-  }, [setMessage]);
-
-  const sendMessage = async (message) => {
-    if (!token || !id || !username) {
-      setNotification("Απαγορευμένη Δράση", "red");
-      return;
-    }
-
-    setSending(true); 
-
-    try {
-      const response = await fetch(
-        "https://seismologos.onrender.com/chat/message",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token, id, username, message }),
-        }
-      );
-
-      if (!response.ok) {
-        console.error(response);
-        throw new Error("Failed to send message");
-      }
-
-      localStorage.removeItem("unsentMessage");
-      setInputValue("");
-      setMessage("");
-    } catch (error) {
-      console.error("Error sending message:", error);
-    } finally {
-      setSending(false);  
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && inputValue.trim() && !sending) {
-      sendMessage(inputValue);
-    }
-  };
-
-  const handleChange = (e) => {
-    const value = e.target.value;
-    if (value.length <= chatBufferSize) {
-      setInputValue(value);
-      setMessage(value);
-      localStorage.setItem("unsentMessage", value);
-    }
-  };
-
-  const handlePaste = (e) => {
-    e.preventDefault();
-    const pastedText = e.clipboardData.getData("text");
-    const newValue = inputValue + pastedText;
-    if (newValue.length > chatBufferSize) {
-      setInputValue(newValue.slice(0, chatBufferSize));
-      setMessage(newValue.slice(0, chatBufferSize));
-      localStorage.setItem("unsentMessage", newValue.slice(0, chatBufferSize));
-    } else {
-      setInputValue(newValue);
-      setMessage(newValue);
-      localStorage.setItem("unsentMessage", newValue);
-    }
-  };
-
-  return (
-    <div className={styles.chatMessage}>
-      <input
-        type="text"
-        placeholder={
-          sessionValid
-            ? "Πληκτρολογήστε το μήνυμα σας εδώ"
-            : "Λειτουργία μόνο για Χρήστες"
-        }
-        className={`${styles.chatInput} ${
-          inputValue.length >= chatBufferSize ? styles.error : ""
-        }`}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        onPaste={handlePaste}
-        value={inputValue}
-        disabled={!sessionValid}
-      />
-    </div>
-  );
-};
-
 const Chat = () => {
   const {
     sessionValid,
@@ -323,9 +322,11 @@ const Chat = () => {
     chatMessages,
   } = useSession();
 
-  const [show, setShow] = useState(
-    () => JSON.parse(localStorage.getItem("showChat")) || false
-  );
+  const [show, setShow] = useState(() => {
+    const savedValue = localStorage.getItem("showChat");
+    return savedValue === "true"; 
+  });
+
   const [message, setMessage] = useState("");
   const [lastSeenMessage, setLastSeenMessage] = useState(0);
   const [currentlySeeingMessage, setCurrentlySeeingMessage] = useState(0);
