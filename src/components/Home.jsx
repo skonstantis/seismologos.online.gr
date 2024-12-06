@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import LeftWrapper from "./LeftWrapper";
+import StationTest from "./StationTest";
 
 const Home = () => {
   useEffect(() => {
@@ -9,6 +10,7 @@ const Home = () => {
   return (
     <div>
       <LeftWrapper />
+      <StationTest/>
     </div>
   );
 };

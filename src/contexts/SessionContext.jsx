@@ -29,8 +29,12 @@ export const SessionProvider = ({ children }) => {
 
   const [activeUsers, setActiveUsers] = useState(0);
   const [activeVisitors, setActiveVisitors] = useState(0);
+  const [activeSensors, setActiveSensors] = useState(0);
 
   const [chatMessages, setChatMessages] = useState([]);
+
+  const [activeStations, setActiveStations] = useState(null);
+  const [sensorData, setSensorData] = useState(null);
 
   const checkSessionTimeout = 30 * 60 * 1000; // 30 minutes
   const checkSessionTimeoutIdRef = useRef(null);
@@ -108,6 +112,7 @@ export const SessionProvider = ({ children }) => {
       if (message?.active) {
         setActiveUsers(message.active.users);
         setActiveVisitors(message.active.visitors);
+        setActiveSensors(message.active.sensors);
       }
 
       if (message?.userStatuses) {
@@ -123,7 +128,25 @@ export const SessionProvider = ({ children }) => {
       if (message?.message) {
         setChatMessages((prevChatMessages) => [...prevChatMessages, message]);
       }
+
+    if (message?.sensorData) {
+        setSensorData(message.sensorData.PGA);
     };
+
+    if(message?.sensorActivity)
+    {
+      if(message.sensorActivity.type == "con")
+      {
+        setSensorData(0.00);
+        
+      }
+      else if(message.sensorActivity.type == "discon")
+      {
+        setSensorData(null);
+      }
+    }
+    
+  };
 
     newSocket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -253,8 +276,10 @@ export const SessionProvider = ({ children }) => {
       username: usernameRef.current,
       activeUsers,
       activeVisitors,
+      activeSensors,
       userStatuses,
       chatMessages,
+      sensorData,
       setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }])
     }}>
       {children}

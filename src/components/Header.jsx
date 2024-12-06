@@ -23,11 +23,11 @@ const AuthLinks = () => (
         <p className={styles.linkText}>Σύνδεση</p>
       </Link>
     </li>
-    <li className={styles.navItem}>
+    {/* <li className={styles.navItem}>
       <Link to="/register" className={styles.link}>
         <p className={styles.linkText}>Εγγραφή</p>
       </Link>
-    </li>
+    </li> */}
   </>
 );
 
@@ -64,9 +64,16 @@ const ActiveVisitors = ({ activeVisitors }) => (
   </li>
 );
 
+const ActiveSensors = ({ activeSensors }) => (
+  <li className={styles.navItem}>
+    <img className={styles.activeIcons} src="../assets/activeSensors.svg" alt="Ενεργοί Σταθμοί" />
+    <span className={styles.activeCount}>{activeSensors}</span>
+  </li>
+);
+
 const Header = () => {
   const location = useLocation();
-  const { sessionValid, loading, activeUsers, activeVisitors } = useSession();
+  const { sessionValid, loading, activeUsers, activeVisitors, activeSensors } = useSession();
   const isAuthPage = location.pathname !== "/";
 
   if (loading) {
@@ -78,6 +85,7 @@ const Header = () => {
       <LogoAndBrand />
       <div className={styles.navRight}>
         <ul className={styles.navList}>
+          <ActiveSensors activeSensors={formatNumber(activeSensors)} />
           <ActiveVisitors activeVisitors={formatNumber(activeVisitors)} />
           <ActiveUsers activeUsers={formatNumber(activeUsers)} />
           {isAuthPage && <HomeLink />}
