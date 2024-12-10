@@ -7,12 +7,18 @@
   z-index: 1000;
 }
 
-.wrapper {
+.outerWrapper
+{
   position: absolute;
+  margin-left: 10px;
   margin-top: 20px;
   width: fit-content;
   bottom: 40px;
   z-index: 0;
+}
+
+.wrapper {
+  position: relative;
 }
 
 .heading,
@@ -38,7 +44,7 @@
 }
 
 .chatHeader {
-  width: 300px;
+  width: 295px;
 }
 
 .light
@@ -57,10 +63,7 @@
   overflow: auto;
   word-wrap: break-word; 
   overflow-wrap: break-word;
-  width: 300px;
-  resize: vertical;
-  min-height: 200px;
-  max-height: 60vh;
+  width: 295px;
 }
 
 .chatMessage {
@@ -70,7 +73,7 @@
 }
 
 .chatInput {
-  width: 280px;
+  width: 275px;
   border: 2px solid #ccc;
   border-radius: 10px;
   font-size: 14px;

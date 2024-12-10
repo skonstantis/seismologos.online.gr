@@ -117,26 +117,33 @@ const ActiveUsersNav = ({ searchElements, selectedList, setSelectedList }) => {
   );
 };
 
-const ActiveUsers = () => {
+const ActiveUsers = ({showActiveUsers, setShowActiveUsers, showActiveSensors, setShowActiveSensors, windowWidth }) => {
   if (!localStorage.getItem("selectedListActiveUsers")) {
     localStorage.setItem("selectedListActiveUsers", "now");
   }
 
-  if (!JSON.parse(localStorage.getItem("showActiveUsersPanel"))) {
-    localStorage.setItem("showActiveUsersPanel", false);
+  if (!JSON.parse(localStorage.getItem("showActiveUsers"))) {
+    localStorage.setItem("showActiveUsers", false);
   }
 
   const { userStatuses } = useSession();
   const [selectedList, setSelectedList] = useState(localStorage.getItem("selectedListActiveUsers"));
-  const [show, setShow] = useState(JSON.parse(localStorage.getItem("showActiveUsersPanel")));
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState(userStatuses || []); 
 
   const handleToggleShow = () => {
-    const newShowStatus = !JSON.parse(localStorage.getItem("showActiveUsersPanel"));
-    localStorage.setItem("showActiveUsersPanel", newShowStatus);
-    setShow(newShowStatus);
+    const newShowStatus = !JSON.parse(localStorage.getItem("showActiveUsers"));
+    localStorage.setItem("showActiveUsers", newShowStatus);
+    setShowActiveUsers(newShowStatus);
   };
+
+  useEffect(() => {
+    if(showActiveSensors && showActiveUsers && windowWidth < 768)
+    {
+        localStorage.setItem("showActiveSensors", false);
+        setShowActiveSensors(false);
+    }
+  }, [showActiveUsers]);
 
   useEffect(() => {
     if (userStatuses) {
@@ -158,11 +165,11 @@ const ActiveUsers = () => {
       <div className={styles.wrapper}>
         <img 
           className={styles.show} 
-          src={show ? "../assets/collapseList.svg" : "../assets/showList.svg"} 
-          alt={show ? "Απόκρυψη" : "Εμφάνιση"} 
+          src={showActiveUsers ? "../assets/collapseList.svg" : "../assets/showList.svg"} 
+          alt={showActiveUsers ? "Απόκρυψη" : "Εμφάνιση"} 
           onClick={handleToggleShow} 
         />
-        {!show && searchResults && 
+        {!showActiveUsers && searchResults && 
           <>
             <div className={styles.headingClosed}>
                 <img className={styles.usersIcon} src="../assets/activeUsers.svg" alt="Συνδεδεμένοι Χρήστες" />
@@ -170,7 +177,7 @@ const ActiveUsers = () => {
             <br/>
           </>
         }
-        {show && searchResults && (
+        {showActiveUsers && searchResults && (
           <div>
             <div className={styles.heading}>
                 <img className={styles.usersIcon} src="../assets/activeUsers.svg" alt="Συνδεδεμένοι Χρήστες" /></div>

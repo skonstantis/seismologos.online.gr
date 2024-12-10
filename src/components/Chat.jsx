@@ -144,6 +144,10 @@ const ChatBody = ({
   setUnseenMessages,
   chatHeight,
   onResize,
+  showChat,
+  showActiveUsers,
+  showActiveSensors,
+  windowWidth,
 }) => {
   const chatBodyRef = useRef(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
@@ -270,7 +274,12 @@ const ChatBody = ({
   };
 
   return (
-    <div style={{ height: `${chatHeight}px`}} className={styles.chatBody} onScroll={handleScroll} ref={chatBodyRef}>
+    <div 
+      style={{ height: showChat ? (showActiveUsers || (showActiveSensors && windowWidth < 768) ? '230px' : '400px') : 'auto' }}
+      className={styles.chatBody} 
+      onScroll={handleScroll} 
+      ref={chatBodyRef}
+    >
       {unseenMessages > 0 ? (
         <div className={styles.unseen} onClick={handleUnseenMessagesClick}>
           {unseenMessages}
@@ -312,7 +321,7 @@ const ChatBody = ({
   );
 };
 
-const Chat = () => {
+const Chat = ({showChat, setShowChat, showActiveUsers, showActiveSensors, windowWidth}) => {
   const {
     sessionValid,
     isUser,
@@ -322,11 +331,6 @@ const Chat = () => {
     setNotification,
     chatMessages,
   } = useSession();
-
-  const [show, setShow] = useState(() => {
-    const savedValue = localStorage.getItem("showChat");
-    return savedValue === "true"; 
-  });
 
   const [message, setMessage] = useState("");
   const [lastSeenMessage, setLastSeenMessage] = useState(null);
@@ -428,17 +432,17 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("showChat", JSON.stringify(show));
-  }, [show]);
+    localStorage.setItem("showChat", JSON.stringify(showChat));
+  }, [showChat]);
 
   useEffect(() => {
     localStorage.setItem("chatHeight", JSON.stringify(chatHeight));
   }, [chatHeight]);
 
   const handleToggleShow = () => {
-    const newShowStatus = !show;
+    const newShowStatus = !showChat;
     localStorage.setItem("showChat", newShowStatus);
-    setShow(newShowStatus);
+    setShowChat(newShowStatus);
   };
 
   const handleResize = (newHeight) => {
@@ -460,65 +464,71 @@ const Chat = () => {
   }, []);
 
   return (
-    <div className={styles.wrapper}>
-      <img
-        className={`${show ? styles.showShow : styles.show}`}
-        src={show ? "../assets/collapseList.svg" : "../assets/showList.svg"}
-        alt={show ? "Hide" : "Show"}
-        onClick={handleToggleShow}
-      />
-      {!show ? (
-        <div className={styles.headingClosed}>
-          <img
-            className={styles.chatIcon}
-            src="../assets/chat.svg"
-            alt="Chat"
-          />
-        </div>
-      ) : (
-        <div>
-          <div className={styles.heading}>
+    <div className={styles.outerWrapper}>
+      <div className={styles.wrapper}>
+        <img
+          className={`${showChat ? styles.showShow : styles.show}`}
+          src={showChat ? "../assets/collapseList.svg" : "../assets/showList.svg"}
+          alt={showChat ? "Hide" : "Show"}
+          onClick={handleToggleShow}
+        />
+        {!showChat ? (
+          <div className={styles.headingClosed}>
             <img
               className={styles.chatIcon}
               src="../assets/chat.svg"
               alt="Chat"
             />
           </div>
-          <ChatHeader />
-          <ChatBody
-            chatMessages={chatMessages}
-            lastSeenMessage={lastSeenMessage}
-            currentlySeeingMessage={currentlySeeingMessage}
-            currentMessage={currentMessage}
-            unseenMessages={unseenMessages}
-            setCurrentMessage={setCurrentMessage}
-            updateLastSeenMessage={updateLastSeenMessage}
-            updateCurrentlySeeingMessage={updateCurrentlySeeingMessage}
-            setUnseenMessages={setUnseenMessages}
-            chatHeight={chatHeight}
-            onResize={handleResize}
-          />
-          {isUser ? (
-            <ChatMessage
-              sessionValid={sessionValid}
-              setMessage={setMessage}
-              setNotification={setNotification}
-              token={authToken}
-              id={id}
-              username={username}
-            />
-          ) : (
-            <ChatMessage
-              sessionValid={sessionValid}
-              setMessage={setMessage}
-              token={null}
-              id={null}
-              username={null}
-            />
-          )}
-          <ChatFooter message={message} />
-        </div>
-      )}
+        ) : (
+          <div>
+            <div className={styles.heading}>
+              <img
+                className={styles.chatIcon}
+                src="../assets/chat.svg"
+                alt="Chat"
+              />
+            </div>
+            <ChatHeader />
+            <ChatBody
+              chatMessages={chatMessages}
+              lastSeenMessage={lastSeenMessage}
+              currentlySeeingMessage={currentlySeeingMessage}
+              currentMessage={currentMessage}
+              unseenMessages={unseenMessages}
+              setCurrentMessage={setCurrentMessage}
+              updateLastSeenMessage={updateLastSeenMessage}
+              updateCurrentlySeeingMessage={updateCurrentlySeeingMessage}
+              setUnseenMessages={setUnseenMessages}
+              chatHeight={chatHeight}
+              onResize={handleResize}
+              showChat={showChat}
+              showActiveUsers={showActiveUsers}
+              showActiveSensors={showActiveSensors} 
+              windowWidth={windowWidth}
+           />
+            {isUser ? (
+              <ChatMessage
+                sessionValid={sessionValid}
+                setMessage={setMessage}
+                setNotification={setNotification}
+                token={authToken}
+                id={id}
+                username={username}
+              />
+            ) : (
+              <ChatMessage
+                sessionValid={sessionValid}
+                setMessage={setMessage}
+                token={null}
+                id={null}
+                username={null}
+              />
+            )}
+            <ChatFooter message={message} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

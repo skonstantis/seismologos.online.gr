@@ -33,8 +33,7 @@ export const SessionProvider = ({ children }) => {
 
   const [chatMessages, setChatMessages] = useState([]);
 
-  const [activeStations, setActiveStations] = useState(null);
-  const [sensorData, setSensorData] = useState(null);
+  const [sensorStatuses, setSensorStatuses] = useState([]);
 
   const checkSessionTimeout = 30 * 60 * 1000; // 30 minutes
   const checkSessionTimeoutIdRef = useRef(null);
@@ -58,6 +57,10 @@ export const SessionProvider = ({ children }) => {
       };
     }
   }, [notificationQueue]);
+
+  useEffect(() => {
+    console.log(sensorStatuses);
+  }, [sensorStatuses]);
 
   const validateSession = async () => {
     try {
@@ -125,24 +128,53 @@ export const SessionProvider = ({ children }) => {
         setUserStatuses(updatedUserStatuses); 
       }
 
+      if (message?.sensorStatuses) {
+        const updatedSensorStatuses = message.sensorStatuses.map(sensorId => ({
+          sensorId,
+          sensorData: 0.00  
+        }));
+        setSensorStatuses([
+          ...sensorStatuses,
+          ...updatedSensorStatuses.filter(item => !sensorStatuses.includes(item))
+        ]);
+      }
+      
+
       if (message?.message) {
         setChatMessages((prevChatMessages) => [...prevChatMessages, message]);
       }
 
-    if (message?.sensorData) {
-        setSensorData(message.sensorData.PGA);
+      if (message?.sensorData) {
+        if (message?.credentials?.id) {
+          setSensorStatuses(prevStatuses => {
+            const updatedStatuses = prevStatuses.map(status => {
+              if (status.sensorId.id === message.credentials.id) {
+                return {
+                  ...status,  
+                  sensorData: message.sensorData.PGA, 
+                };
+              }
+              return status;
+            });
+            return updatedStatuses;
+          });
+        } 
     };
 
-    if(message?.sensorActivity)
-    {
-      if(message.sensorActivity.type == "con")
-      {
-        setSensorData(0.00);
-        
+    if (message?.sensorActivity) {
+      if (message.sensorActivity.type == "con") {
+        if (!sensorStatuses.some(status => status.sensorId === message.sensorActivity.which)) {
+          setSensorStatuses([
+            ...sensorStatuses,
+            { sensorId: message.sensorActivity.which, sensorData: 0.00 }
+          ]);
+        }
       }
-      else if(message.sensorActivity.type == "discon")
-      {
-        setSensorData(null);
+      else if (message.sensorActivity.type == "discon") {
+        const updatedSensorStatuses = sensorStatuses.filter(
+          (status) => status.sensorId !== message.sensorActivity.which
+        );
+        setSensorStatuses(updatedSensorStatuses);
       }
     }
     
@@ -279,7 +311,7 @@ export const SessionProvider = ({ children }) => {
       activeSensors,
       userStatuses,
       chatMessages,
-      sensorData,
+      sensorStatuses,
       setNotification: (msg, color = "green") => setNotificationQueue((prevQueue) => [...prevQueue, { message: msg, color }])
     }}>
       {children}

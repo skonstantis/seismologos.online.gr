@@ -1,0 +1,58 @@
+.wrapper
+{
+  position: absolute;
+  right: 0px;
+  margin-right: 10px;
+  margin-top: 20px;
+  width: fit-content;
+}
+
+.sensorsHeader {
+  width: 290px;
+}
+
+.heading,
+.headingClosed {
+  font-weight: bolder;
+  color: white;
+  background-color: rgb(18, 31, 65);
+  font-size: 16px;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+}
+
+.headingClosed {
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.sensorsIcon,
+.sensorsIconRaw
+ {
+  width: 20px;
+  padding: 3px;
+  padding-top: 5px;
+}
+
+.sensorsIcon
+{
+  margin-right: 20px;
+}
+
+.show,
+.showShow {
+  width: 18px;
+  position: absolute;
+  right: 7px;
+  top: 5px;
+  z-index: 1000;
+}
+
+.sensorsBody {
+  position: relative;
+  background-color: rgb(35, 52, 97);
+  overflow: auto;
+  height: 180px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
