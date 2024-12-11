@@ -129,9 +129,9 @@ export const SessionProvider = ({ children }) => {
       }
 
       if (message?.sensorStatuses) {
-        const updatedSensorStatuses = message.sensorStatuses.map(sensorId => ({
-          sensorId,
-          sensorData: 0.00  
+        const updatedSensorStatuses = message.sensorStatuses.map(attributes => ({
+          ...attributes,
+          data: 0.00  
         }));
         setSensorStatuses([
           ...sensorStatuses,
@@ -148,10 +148,10 @@ export const SessionProvider = ({ children }) => {
         if (message?.credentials?.id) {
           setSensorStatuses(prevStatuses => {
             const updatedStatuses = prevStatuses.map(status => {
-              if (status.sensorId.id === message.credentials.id) {
+              if (status.id === message.credentials.id) {
                 return {
                   ...status,  
-                  sensorData: message.sensorData.PGA, 
+                  data: message.sensorData.PGA, 
                 };
               }
               return status;
@@ -162,22 +162,44 @@ export const SessionProvider = ({ children }) => {
     };
 
     if (message?.sensorActivity) {
-      if (message.sensorActivity.type == "con") {
-        if (!sensorStatuses.some(status => status.sensorId === message.sensorActivity.which)) {
-          setSensorStatuses([
-            ...sensorStatuses,
-            { sensorId: message.sensorActivity.which, sensorData: 0.00 }
-          ]);
-        }
-      }
-      else if (message.sensorActivity.type == "discon") {
-        const updatedSensorStatuses = sensorStatuses.filter(
-          (status) => status.sensorId !== message.sensorActivity.which
-        );
-        setSensorStatuses(updatedSensorStatuses);
-      }
-    }
-    
+      if (message?.sensorActivity) {
+        setSensorStatuses((prevSensorStatuses) => {
+          const sensorIndex = prevSensorStatuses.findIndex(status => status.id === message.sensorActivity.which);
+      
+          if (message.sensorActivity.type === "con") {
+            if (sensorIndex === -1) {
+              return [
+                ...prevSensorStatuses,
+                { id: message.sensorActivity.which, active: true, data: 0.00 }
+              ];
+            } else {
+              const updatedStatuses = [...prevSensorStatuses];
+              updatedStatuses[sensorIndex] = {
+                ...updatedStatuses[sensorIndex],
+                active: true 
+              };
+              return updatedStatuses;
+            }
+          } else if (message.sensorActivity.type === "discon") {
+            if (sensorIndex === -1) {
+              return [
+                ...prevSensorStatuses,
+                {id: message.sensorActivity.which, active: false, data: 0.00 }
+              ];
+            } else {
+              const updatedStatuses = [...prevSensorStatuses];
+              updatedStatuses[sensorIndex] = {
+                ...updatedStatuses[sensorIndex],
+                active: false 
+              };
+              return updatedStatuses;
+            }
+          }
+      
+          return prevSensorStatuses;
+        });
+      }      
+    }  
   };
 
     newSocket.onerror = (error) => {

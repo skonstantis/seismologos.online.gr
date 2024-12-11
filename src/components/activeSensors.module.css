@@ -11,21 +11,6 @@
   width: 290px;
 }
 
-.heading,
-.headingClosed {
-  font-weight: bolder;
-  color: white;
-  background-color: rgb(18, 31, 65);
-  font-size: 16px;
-  border-top-right-radius: 10px;
-  border-top-left-radius: 10px;
-}
-
-.headingClosed {
-  border-radius: 10px;
-  padding: 5px;
-}
-
 .sensorsIcon,
 .sensorsIconRaw
  {
@@ -53,6 +38,139 @@
   background-color: rgb(35, 52, 97);
   overflow: auto;
   height: 180px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.heading,
+.headingClosed {
+  font-weight: bolder;
+  color: white;
+  background-color: rgb(18, 31, 65); 
+  font-size: 16px;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+}
+
+.headingClosed {
+  border-radius: 10px;
+  padding: 5px;
+}
+
+
+.sensorListWrapperOuter {
+  background-color: rgb(18, 31, 65);
+  overflow: hidden; 
+  color: white;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  position: relative; 
+}
+
+.sensorListWrapperInner {
+  max-height: 130px;
+  overflow-y: auto; 
+}
+
+.activeSensorsNavContainer {
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.activeSensorsNavButton {
+  background-color: rgb(35, 52, 97); 
+  width: 60%;
+  padding: 3px;
+  text-align: center;
+  color: rgb(199, 199, 199);
+}
+
+.active {
+  background-color: rgb(18, 31, 65);
+  font-weight: bold;
+  color: white;
+  border-bottom: 2px solid white;
+}
+
+.light {
+  background-color: rgb(46, 67, 124);
+}
+
+.dark {
+  background-color: rgb(38, 56, 104);
+}
+
+.sensor {
+  display: flex;
+  justify-content: left;
+}
+
+.id {
+  position: relative;
+  margin: 3px;
+  text-align: left;
+  width: 235px;
+  overflow: hidden; 
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.intensity {
+  width: 54px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.offline {
+  width: 54px;
+  text-align: center;
+  font-weight: bold;
+  color: red;
+  font-size: 20px;
+}
+
+.intensity
+{
+  width: 18px;
+}
+
+.idScroll {
+  display: inline-block; 
+  white-space: nowrap; 
+  animation: scroll 20s linear infinite; 
+  overflow: hidden; 
+  margin-bottom: -5px;
+}
+
+@keyframes scroll {
+  0% {
+      transform: translateX(10%);
+  }
+  100% {
+      transform: translateX(-100%);
+  }
+}
+
+.searchInput {
+  width: 280px;
+  margin: 4px;
+  border: 2px solid rgb(255, 255, 255);
+  color: rgb(35, 52, 97); 
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.searchBar,
+.searchBarEmpty {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  background-color: rgb(35, 52, 97); 
+}
+
+.searchBarEmpty {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }

@@ -3,9 +3,41 @@ import { useSession } from "../contexts/SessionContext";
 import { formatElapsedTimeShort } from "../js/helpers/elapsedTime";
 import { formatNumber } from "../js/helpers/formatNumber";
 import styles from "./activeUsers.module.css";
-import SearchBar from "./SearchBar"; 
 
 const forceRenderTimeout = 10000; //ms
+
+const SearchBar = ({
+  searchElements,
+  searchTerm,
+  setSearchTerm,
+  setSearchResults,
+  placeholder = "Αναζήτηση",
+  inputClassName,
+  barClassName,
+}) => {
+  useEffect(() => {
+    if (Array.isArray(searchElements)) { 
+      const results = searchElements.filter(element =>
+        element.username.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchResults(results);
+    } else {
+      setSearchResults([]); 
+    }
+  }, [searchTerm, searchElements, setSearchResults]);
+
+  return (
+    <div className={barClassName || styles.searchBar}>
+      <input
+        type="text"
+        className={inputClassName || styles.searchInput}
+        placeholder={placeholder}
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+      />
+    </div>
+  );
+};
 
 const UserItem = ({ status, color }) => {
   const usernameRef = useRef(null);
