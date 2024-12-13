@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./map.css";
 import { useSession } from "../contexts/SessionContext";
+import Loading from "./Loading";
 
 const greeceStyle = {
   color: "#FFFFFF",
@@ -77,7 +78,11 @@ const SensorMarkers = ({ sensorStatuses }) => {
 };
 
 const Map = () => {
+  
   const { sensorStatuses } = useSession();
+  
+  const [isGreeceLoading, setIsGreeceLoading] = useState(true);
+  const [isEuropeLoading, setIsEuropeLoading] = useState(true);
 
   const [mapCenter, setMapCenter] = useState(() => {
     const savedCenter = sessionStorage.getItem("mapCenter");
@@ -95,12 +100,19 @@ const Map = () => {
   useEffect(() => {
     fetch("../../assets/greece.geojson")
       .then((response) => response.json())
-      .then((data) => setGreeceData(data))
+      .then((data) => 
+      {
+        setGreeceData(data);
+        setIsGreeceLoading(false);
+      })
       .catch((error) => console.error("Error loading Greece GeoJSON:", error));
 
     fetch("../../assets/europe.geojson")
       .then((response) => response.json())
-      .then((data) => setEuropeData(data))
+      .then((data) => {
+        setEuropeData(data);
+        setIsEuropeLoading(false);
+      })
       .catch((error) => console.error("Error loading Europe GeoJSON:", error));
   }, []);
 
@@ -141,6 +153,10 @@ const Map = () => {
       });
     });
   };
+
+  if (isGreeceLoading || isEuropeLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="map-container">
