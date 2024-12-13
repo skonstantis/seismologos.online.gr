@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./home.module.css";
 import ActiveUsers from "./ActiveUsers";
 import Chat from "./Chat";
+import Map from "./Map";
 import ActiveSensors from "./ActiveSensors";
 
 const Home = () => {
@@ -38,6 +39,7 @@ const Home = () => {
 
   return (
     <div className={styles.wrapper}>
+      <Map/>
       <ActiveUsers
         showActiveUsers={showActiveUsers}
         setShowActiveUsers={setShowActiveUsers}

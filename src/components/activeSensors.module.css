@@ -5,6 +5,7 @@
   margin-right: 10px;
   margin-top: 20px;
   width: fit-content;
+  z-index: 10;
 }
 
 .sensorsHeader {
@@ -134,7 +135,7 @@
 
 .intensity
 {
-  width: 18px;
+  width: 19px;
 }
 
 .idScroll {

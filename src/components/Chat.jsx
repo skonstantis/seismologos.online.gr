@@ -302,7 +302,7 @@ const ChatBody = ({
           ref={(el) => (messageRefs.current[index] = el)}
         >
           <div className={styles.chatInnerHeader}>
-            <div className={styles.user}>{message.username}</div>
+            <div className={styles.user}>{message.user}</div>
             <div className={styles.time}>
               {formatElapsedTimeShort(Date.now() - message.created)}
             </div>

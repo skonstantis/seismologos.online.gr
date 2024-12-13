@@ -11,7 +11,6 @@
   z-index: 998;
   max-width: 100%;
   font-size: 13px;
-  background-color: gray;
 }
 
 .linksContainer {
@@ -34,6 +33,7 @@
 .copyRight {
   margin-left: auto;
   backdrop-filter: blur(10px);
+  margin-bottom: 14px;
 }
 
 .x {

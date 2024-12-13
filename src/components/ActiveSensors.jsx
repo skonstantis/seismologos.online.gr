@@ -54,7 +54,7 @@ const SensorItem = ({ sensor, color }) => {
   }, [sensor.id]);
 
   const data = sensor.data || 0;
-  const roundedValue = Math.max(0, Math.min(Math.round(parseFloat(data) || 0), 12));
+  const roundedValue = sensor.data > 0 ? sensor.data > 11 ? 12 : Math.floor(sensor.data) + 1 : 0;
 
   return (
     <div className={`${styles.sensor} ${color === "light" ? styles.light : styles.dark}`}>
